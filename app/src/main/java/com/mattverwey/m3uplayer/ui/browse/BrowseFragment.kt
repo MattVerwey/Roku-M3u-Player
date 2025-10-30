@@ -2,6 +2,7 @@ package com.mattverwey.m3uplayer.ui.browse
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.leanback.app.BrowseSupportFragment
@@ -14,6 +15,7 @@ import com.mattverwey.m3uplayer.data.model.ChannelCategory
 import com.mattverwey.m3uplayer.repository.ChannelRepository
 import com.mattverwey.m3uplayer.ui.details.DetailsActivity
 import com.mattverwey.m3uplayer.ui.playback.PlaybackActivity
+import com.mattverwey.m3uplayer.ui.settings.SettingsActivity
 import kotlinx.coroutines.launch
 
 class BrowseFragment : BrowseSupportFragment() {
@@ -49,6 +51,20 @@ class BrowseFragment : BrowseSupportFragment() {
                 }
             }
         }
+        
+        // Handle menu button press to open settings
+        setOnKeyInterceptListener { _, keyCode, event ->
+            if (event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_MENU) {
+                openSettings()
+                true
+            } else {
+                false
+            }
+        }
+    }
+    
+    private fun openSettings() {
+        SettingsActivity.start(requireContext())
     }
     
     private fun loadChannels() {

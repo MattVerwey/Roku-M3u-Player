@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:padding="40dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- Header -->
+        <TextView
+            android:id="@+id/settings_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Privacy &amp; Security Settings"
+            android:textSize="32sp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:layout_marginBottom="40dp" />
+
+        <!-- Current Source -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#1A1A1A"
+            android:padding="20dp"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Current Source"
+                android:textSize="18sp"
+                android:textColor="#AAAAAA"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/current_source_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="M3U Playlist"
+                android:textSize="22sp"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Viewing History Tracking -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="#1A1A1A"
+            android:padding="20dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Track Viewing History"
+                    android:textSize="20sp"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Show recently watched channels"
+                    android:textSize="14sp"
+                    android:textColor="#AAAAAA" />
+            </LinearLayout>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/tracking_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true" />
+        </LinearLayout>
+
+        <!-- Clear History Button -->
+        <Button
+            android:id="@+id/clear_history_button"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Clear Viewing History"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:background="#2A2A2A"
+            android:layout_marginBottom="20dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+
+        <!-- Clear Cache Button -->
+        <Button
+            android:id="@+id/clear_cache_button"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Clear Cache"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:background="#2A2A2A"
+            android:layout_marginBottom="20dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+
+        <!-- Logout Button -->
+        <Button
+            android:id="@+id/logout_button"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Logout (Clear All Data)"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:background="#AA2222"
+            android:layout_marginBottom="20dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+
+        <!-- Security Info -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#1A1A1A"
+            android:padding="20dp"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Security Information"
+                android:textSize="18sp"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="• All credentials are encrypted using AES-256 encryption\n• Viewing history is stored securely on your device\n• No data is shared with third parties\n• Stream URLs are protected in encrypted storage"
+                android:textSize="14sp"
+                android:textColor="#AAAAAA"
+                android:lineSpacingExtra="4dp" />
+        </LinearLayout>
+
+        <!-- Back Button -->
+        <Button
+            android:id="@+id/back_button"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Back"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:background="#2A2A2A"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+
+    </LinearLayout>
+</ScrollView>
