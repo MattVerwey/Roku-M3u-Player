@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">M3U Player</string>
+    <string name="browse_title">Browse</string>
+    <string name="live_tv">Live TV</string>
+    <string name="movies">Movies</string>
+    <string name="series">Series</string>
+    <string name="recently_watched">Recently Watched</string>
+    <string name="settings">Settings</string>
+    <string name="search">Search</string>
+    
+    <!-- Login -->
+    <string name="login_title">Login to IPTV Service</string>
+    <string name="login_type">Login Type</string>
+    <string name="m3u_url">M3U URL</string>
+    <string name="xtream_server">Xtream Server URL</string>
+    <string name="xtream_username">Username</string>
+    <string name="xtream_password">Password</string>
+    <string name="login_button">Login</string>
+    <string name="connecting">Connecting...</string>
+    <string name="login_failed">Login failed</string>
+    <string name="login_success">Login successful</string>
+    
+    <!-- Playback -->
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="loading">Loading...</string>
+    <string name="error_playback">Playback error occurred</string>
+    
+    <!-- Details -->
+    <string name="no_description">No description available</string>
+    <string name="watch_now">Watch Now</string>
+    <string name="duration">Duration</string>
+    <string name="rating">Rating</string>
+    <string name="genre">Genre</string>
+    
+    <!-- Messages -->
+    <string name="no_channels">No channels available</string>
+    <string name="loading_channels">Loading channels...</string>
+    <string name="error_loading">Error loading content</string>
+    <string name="retry">Retry</string>
+</resources>

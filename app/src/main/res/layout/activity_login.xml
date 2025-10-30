@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="600dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_large">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/spacing_large"
+            android:text="@string/login_title"
+            android:textColor="@color/text_primary"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_small"
+            android:text="@string/login_type"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_size_body" />
+
+        <RadioGroup
+            android:id="@+id/login_type_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_large"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/login_type_m3u"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="true"
+                android:text="M3U URL"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_size_body" />
+
+            <RadioButton
+                android:id="@+id/login_type_xtream"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Xtream Codes"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_size_body" />
+        </RadioGroup>
+
+        <!-- M3U Input -->
+        <LinearLayout
+            android:id="@+id/m3u_input_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_small"
+                android:text="@string/m3u_url"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_size_body" />
+
+            <EditText
+                android:id="@+id/m3u_url_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_medium"
+                android:background="@color/card_background"
+                android:hint="http://example.com/playlist.m3u"
+                android:inputType="textUri"
+                android:padding="@dimen/spacing_medium"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
+                android:textSize="@dimen/text_size_body" />
+        </LinearLayout>
+
+        <!-- Xtream Input -->
+        <LinearLayout
+            android:id="@+id/xtream_input_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_small"
+                android:text="@string/xtream_server"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_size_body" />
+
+            <EditText
+                android:id="@+id/xtream_server_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_medium"
+                android:background="@color/card_background"
+                android:hint="http://server.com:port"
+                android:inputType="textUri"
+                android:padding="@dimen/spacing_medium"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
+                android:textSize="@dimen/text_size_body" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_small"
+                android:text="@string/xtream_username"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_size_body" />
+
+            <EditText
+                android:id="@+id/xtream_username_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_medium"
+                android:background="@color/card_background"
+                android:hint="Username"
+                android:inputType="text"
+                android:padding="@dimen/spacing_medium"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
+                android:textSize="@dimen/text_size_body" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_small"
+                android:text="@string/xtream_password"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_size_body" />
+
+            <EditText
+                android:id="@+id/xtream_password_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_medium"
+                android:background="@color/card_background"
+                android:hint="Password"
+                android:inputType="textPassword"
+                android:padding="@dimen/spacing_medium"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
+                android:textSize="@dimen/text_size_body" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/login_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:background="@color/primary"
+            android:padding="@dimen/spacing_medium"
+            android:text="@string/login_button"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_size_body" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:visibility="gone" />
+    </LinearLayout>
+</ScrollView>
