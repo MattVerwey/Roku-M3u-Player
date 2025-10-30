@@ -21,7 +21,7 @@ Shows the 30 most recently added movies and series from your Xtream playlist.
 
 ### 2. Personalized Recommendations
 
-Machine learning-based recommendations that appear at the bottom of the browse screen.
+Intelligent recommendations that appear at the bottom of the browse screen.
 
 **How it works:**
 - Analyzes your watch history to understand your preferences
