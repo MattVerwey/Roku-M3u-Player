@@ -14,11 +14,14 @@ A modern IPTV player for Amazon Fire TV Cube and Fire TV devices with support fo
 - ✅ **Image Loading** - Channel logos and poster images with caching
 
 ### User Interface
+- **Personalized Home Page** - Landing page with Recently Watched, Recommendations, and Latest Added
 - Modern card-based browsing with poster grid layout
 - Category organization (Live TV, Movies, Series)
+- **Smart Recommendations** - Intelligent content suggestions based on viewing history
 - Channel details screen with metadata
 - Smooth navigation optimized for D-pad control
 - Dark theme optimized for TV viewing
+- Easy sidebar navigation between all sections
 
 ### Video Playback
 - Powered by ExoPlayer for robust streaming
@@ -142,14 +145,27 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 
 ### Navigation
 
-- **D-Pad**: Navigate through channels and categories
-- **Select/Enter**: Play channel or view details
-- **Back**: Return to previous screen or hide playback controls
+#### Home Page
+- **Recently Watched**: Quick access to your recently viewed content at the top
+- **Recommended For You**: Personalized recommendations based on your watch history
+- **Latest Added**: Newest content added to your library
+- **Category Sections**: Live TV, Movies, and Series organized for easy browsing
+
+#### D-Pad Navigation
+- **Left/Right**: Navigate between items in a row
+- **Up/Down**: Switch between rows or open/close sidebar menu
+- **Select/Enter**: Play channel (Live TV) or view details (Movies/Series)
+- **Back**: Return to previous screen, close sidebar, or hide playback controls
 - **Home**: Enter Picture-in-Picture mode (during playback)
-- **Menu** (3 lines button): Toggle playback controls or access options menu
+
+#### Settings Menu
+- Navigate to **Settings** row in sidebar to access:
   - Refresh Channels
-  - Clear Cache
-  - Logout
+  - Privacy & Security Settings
+    - Toggle viewing history tracking
+    - Clear viewing history
+    - Clear cache
+    - Logout
 
 ### Playback Controls (During Video Playback)
 
