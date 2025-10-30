@@ -101,11 +101,11 @@ fun generateRecommendations(
 5. **Recent Release Bonus (+2.0)**
    - Content from last 3 years gets extra points
 
-**Machine Learning Aspect:**
-- Pattern recognition from watch history
-- Adaptive weighting based on user behavior
-- Improves accuracy as more content is watched
-- On-device computation (privacy-focused)
+**Intelligent Recommendation Approach:**
+- Uses rule-based, weighted heuristics to analyze watch history
+- Adjusts recommendation scores based on observed user preferences
+- Recommendations become more relevant as more content is watched
+- All computations are performed on-device (privacy-focused)
 
 ### 4. UI Updates ✅
 
