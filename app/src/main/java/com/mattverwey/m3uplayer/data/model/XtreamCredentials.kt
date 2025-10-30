@@ -1,10 +1,14 @@
 package com.mattverwey.m3uplayer.data.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class XtreamCredentials(
     val serverUrl: String,
     val username: String,
     val password: String
-) {
+) : Parcelable {
     fun toApiUrl(): String {
         return "$serverUrl/player_api.php?username=$username&password=$password"
     }

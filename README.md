@@ -28,6 +28,20 @@ A modern IPTV player for Amazon Fire TV Cube and Fire TV devices with support fo
 - **Fast startup**: 2.5-second pre-buffer for quick playback
 - Picture-in-Picture mode for multitasking
 - Playback controls optimized for Fire TV remote
+- **Enhanced Playback Controls**:
+  - Subtitle toggle (on/off) without interrupting playback
+  - Audio track selection with language information
+  - Video quality selection with manual control
+  - Rewind/Fast-forward (10-second skip)
+  - Smooth controls that auto-hide after 5 seconds
+- **TV Guide Integration**:
+  - Live EPG (Electronic Program Guide) for live TV channels
+  - Current and upcoming program information
+  - Free EPG data from iptv-org (US, UK, CA coverage)
+- **Series Support**:
+  - Play next episode button for series content
+  - Auto-play next episode on completion
+  - Season and episode navigation
 
 ### Data Management & Security
 - Persistent caching of playlists (24-hour expiry)
@@ -130,12 +144,24 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 
 - **D-Pad**: Navigate through channels and categories
 - **Select/Enter**: Play channel or view details
-- **Back**: Return to previous screen
+- **Back**: Return to previous screen or hide playback controls
 - **Home**: Enter Picture-in-Picture mode (during playback)
-- **Menu** (3 lines button): Access quick options menu
+- **Menu** (3 lines button): Toggle playback controls or access options menu
   - Refresh Channels
   - Clear Cache
   - Logout
+
+### Playback Controls (During Video Playback)
+
+- **Menu/Center Button**: Show/hide playback controls
+- **Rewind Button**: Skip back 10 seconds
+- **Fast Forward Button**: Skip forward 10 seconds
+- **Play/Pause**: Toggle playback
+- **Subtitles Button**: Turn subtitles on/off and select subtitle track
+- **Audio Track Button**: Select audio language and format
+- **Video Quality Button**: Choose video resolution and bitrate
+- **TV Guide Button** (Live TV only): View current and upcoming programs
+- **Play Next Button** (Series only): Play next episode
 
 ### Picture-in-Picture
 
@@ -261,14 +287,16 @@ private const val MAX_RECENTLY_WATCHED = 50
 
 ## Future Enhancements
 
-- [ ] Full EPG integration with program guide
-- [ ] Series support with season/episode navigation
+- [x] Full EPG integration with program guide
+- [x] Series support with season/episode navigation
 - [ ] Catch-up TV (timeshift)
 - [ ] Favorites management
 - [ ] Multiple profile support
 - [ ] Parental controls
 - [ ] Background audio playback
 - [ ] Chromecast support
+- [ ] Bookmarks and resume playback
+- [ ] Advanced subtitle styling options
 
 ## Migration from Roku
 

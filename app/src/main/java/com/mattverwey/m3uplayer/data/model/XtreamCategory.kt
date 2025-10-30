@@ -1,5 +1,8 @@
 package com.mattverwey.m3uplayer.data.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
 data class XtreamCategory(
     val category_id: String,
     val category_name: String,
@@ -89,7 +92,7 @@ data class XtreamSeries(
     val cast: String? = null,
     val director: String? = null,
     val genre: String? = null,
-    val releaseDate: String? = null,
+    val releaseDate: String? = nu
     val last_modified: String? = null,
     val rating: String? = null,
     val rating_5based: Double? = null,
@@ -99,13 +102,15 @@ data class XtreamSeries(
     val category_id: String? = null
 )
 
+@Parcelize
 data class XtreamSeriesInfo(
-    val seasons: List<SeriesSeason>? = null,
+    val seasons: List<XtreamSeason>? = null,
     val info: SeriesInfoDetails? = null,
-    val episodes: Map<String, List<SeriesEpisode>>? = null
-)
+    val episodes: Map<String, List<XtreamEpisode>>? = null
+) : Parcelable
 
-data class SeriesSeason(
+@Parcelize
+data class XtreamSeason(
     val air_date: String? = null,
     val episode_count: Int? = null,
     val id: Int? = null,
@@ -114,8 +119,33 @@ data class SeriesSeason(
     val season_number: Int,
     val cover: String? = null,
     val cover_big: String? = null
-)
+) : Parcelable
 
+@Parcelize
+data class XtreamEpisode(
+    val id: String,
+    val episode_num: Int,
+    val title: String,
+    val container_extension: String? = null,
+    val info: EpisodeInfo? = null,
+    val custom_sid: String? = null,
+    val added: String? = null,
+    val season: Int,
+    val direct_source: String? = null
+) : Parcelable
+
+@Parcelize
+data class EpisodeInfo(
+    val name: String? = null,
+    val overview: String? = null,
+    val air_date: String? = null,
+    val rating: String? = null,
+    val movie_image: String? = null,
+    val duration_secs: Int? = null,
+    val duration: String? = null
+) : Parcelable
+
+@Parcelize
 data class SeriesInfoDetails(
     val name: String? = null,
     val cover: String? = null,
@@ -131,24 +161,4 @@ data class SeriesInfoDetails(
     val youtube_trailer: String? = null,
     val episode_run_time: String? = null,
     val category_id: String? = null
-)
-
-data class SeriesEpisode(
-    val id: String? = null,
-    val episode_num: Int,
-    val title: String? = null,
-    val container_extension: String? = null,
-    val info: EpisodeInfo? = null,
-    val custom_sid: String? = null,
-    val added: String? = null,
-    val season: Int,
-    val direct_source: String? = null
-)
-
-data class EpisodeInfo(
-    val name: String? = null,
-    val overview: String? = null,
-    val air_date: String? = null,
-    val rating: String? = null,
-    val movie_image: String? = null
-)
+) : Parcelable
