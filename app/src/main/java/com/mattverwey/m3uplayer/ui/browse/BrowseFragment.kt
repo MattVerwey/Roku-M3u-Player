@@ -15,7 +15,6 @@ import com.mattverwey.m3uplayer.data.model.Channel
 import com.mattverwey.m3uplayer.data.model.ChannelCategory
 import com.mattverwey.m3uplayer.repository.ChannelRepository
 import com.mattverwey.m3uplayer.ui.details.DetailsActivity
-import com.mattverwey.m3uplayer.ui.login.LoginActivity
 import com.mattverwey.m3uplayer.ui.playback.PlaybackActivity
 import com.mattverwey.m3uplayer.ui.settings.SettingsActivity
 import kotlinx.coroutines.launch
