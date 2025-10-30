@@ -6,10 +6,15 @@ import com.mattverwey.m3uplayer.data.model.XtreamSeriesInfo
 
 /**
  * Helper class to manage series playback and episode navigation
+ * @param seriesInfo Series information containing episodes data
+ * @param credentials Xtream API credentials for stream URL construction
+ * @param defaultExtension Default container extension to use when episode doesn't specify one.
+ *                        Common values: "mkv", "mp4", "ts", "m3u8" depending on provider
  */
 class SeriesPlaybackHelper(
     private val seriesInfo: XtreamSeriesInfo?,
-    private val credentials: XtreamCredentials
+    private val credentials: XtreamCredentials,
+    private val defaultExtension: String = "mkv"
 ) {
     
     /**
@@ -44,9 +49,10 @@ class SeriesPlaybackHelper(
     
     /**
      * Gets the stream URL for an episode
+     * Uses the episode's container extension if available, otherwise falls back to the configured default
      */
     fun getEpisodeStreamUrl(episode: XtreamEpisode): String {
-        val extension = episode.container_extension ?: "mp4"
+        val extension = episode.container_extension ?: defaultExtension
         return "${credentials.serverUrl}/series/${credentials.username}/${credentials.password}/${episode.id}.$extension"
     }
     
