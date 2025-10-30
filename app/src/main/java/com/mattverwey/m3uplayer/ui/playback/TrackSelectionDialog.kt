@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import androidx.media3.common.C
 import androidx.media3.common.Player
+import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.Tracks
 import androidx.media3.exoplayer.ExoPlayer
 
@@ -153,11 +154,24 @@ class TrackSelectionDialog(
             }
             TrackType.AUDIO -> {
                 if (groupIndex == -1) {
-                    // Auto selection
+                    // Auto selection - clear manual overrides
                     parameters.clearOverridesOfType(C.TRACK_TYPE_AUDIO)
                 } else {
-                    // Manual selection handled by ExoPlayer
-                    parameters.clearOverridesOfType(C.TRACK_TYPE_AUDIO)
+                    // Manual selection - override with specific track
+                    val tracks = player.currentTracks
+                    val audioGroups = tracks.groups.filter { it.type == C.TRACK_TYPE_AUDIO }
+                    if (groupIndex < audioGroups.size) {
+                        val selectedGroup = audioGroups[groupIndex]
+                        val trackGroup = selectedGroup.mediaTrackGroup
+                        
+                        // Create override to select specific track
+                        val override = androidx.media3.common.TrackSelectionOverride(
+                            trackGroup,
+                            listOf(trackIndex.coerceIn(0, trackGroup.length - 1))
+                        )
+                        parameters.clearOverridesOfType(C.TRACK_TYPE_AUDIO)
+                        parameters.addOverride(override)
+                    }
                 }
             }
             TrackType.VIDEO -> {
@@ -165,8 +179,21 @@ class TrackSelectionDialog(
                     // Auto selection - clear manual overrides
                     parameters.clearOverridesOfType(C.TRACK_TYPE_VIDEO)
                 } else {
-                    // Manual selection handled by ExoPlayer
-                    parameters.clearOverridesOfType(C.TRACK_TYPE_VIDEO)
+                    // Manual selection - override with specific track
+                    val tracks = player.currentTracks
+                    val videoGroups = tracks.groups.filter { it.type == C.TRACK_TYPE_VIDEO }
+                    if (groupIndex < videoGroups.size) {
+                        val selectedGroup = videoGroups[groupIndex]
+                        val trackGroup = selectedGroup.mediaTrackGroup
+                        
+                        // Create override to select specific track
+                        val override = androidx.media3.common.TrackSelectionOverride(
+                            trackGroup,
+                            listOf(trackIndex.coerceIn(0, trackGroup.length - 1))
+                        )
+                        parameters.clearOverridesOfType(C.TRACK_TYPE_VIDEO)
+                        parameters.addOverride(override)
+                    }
                 }
             }
         }
