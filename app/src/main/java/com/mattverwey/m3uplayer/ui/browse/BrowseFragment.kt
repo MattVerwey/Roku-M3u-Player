@@ -1,7 +1,9 @@
 package com.mattverwey.m3uplayer.ui.browse
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.leanback.app.BrowseSupportFragment
@@ -13,6 +15,7 @@ import com.mattverwey.m3uplayer.data.model.Channel
 import com.mattverwey.m3uplayer.data.model.ChannelCategory
 import com.mattverwey.m3uplayer.repository.ChannelRepository
 import com.mattverwey.m3uplayer.ui.details.DetailsActivity
+import com.mattverwey.m3uplayer.ui.login.LoginActivity
 import com.mattverwey.m3uplayer.ui.playback.PlaybackActivity
 import kotlinx.coroutines.launch
 
@@ -146,5 +149,67 @@ class BrowseFragment : BrowseSupportFragment() {
     
     private fun hideProgressBar() {
         progressBarManager?.hide()
+    }
+    
+    // Handle Fire TV menu button (3 lines button)
+    override fun onResume() {
+        super.onResume()
+        view?.isFocusableInTouchMode = true
+        view?.requestFocus()
+        view?.setOnKeyListener { _, keyCode, event ->
+            if (event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_MENU) {
+                showOptionsMenu()
+                true
+            } else {
+                false
+            }
+        }
+    }
+    
+    private fun showOptionsMenu() {
+        val options = arrayOf(
+            "Refresh Channels",
+            "Clear Cache",
+            "Logout"
+        )
+        
+        AlertDialog.Builder(requireContext())
+            .setTitle("Options")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> refreshChannels()
+                    1 -> clearCache()
+                    2 -> logout()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+    
+    private fun refreshChannels() {
+        Toast.makeText(requireContext(), "Refreshing channels...", Toast.LENGTH_SHORT).show()
+        repository.clearCache()
+        loadChannels()
+    }
+    
+    private fun clearCache() {
+        repository.clearCache()
+        Toast.makeText(requireContext(), "Cache cleared", Toast.LENGTH_SHORT).show()
+        loadChannels()
+    }
+    
+    private fun logout() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Logout")
+            .setMessage("Are you sure you want to logout?")
+            .setPositiveButton("Yes") { _, _ ->
+                repository.clearCache()
+                val intent = Intent(requireContext(), LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                requireActivity().finish()
+            }
+            .setNegativeButton("No", null)
+            .show()
     }
 }
