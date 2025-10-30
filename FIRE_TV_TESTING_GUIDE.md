@@ -88,9 +88,20 @@ Before building, ensure you have:
 2. **Generate Gradle Wrapper** (if not present):
    
    The project uses Gradle Wrapper, which may need to be generated:
+   
+   **Option 1: Using system Gradle (Recommended)**
    ```bash
-   # If gradlew doesn't exist, generate it using your system Gradle
-   # First, install Gradle if needed (version 8.2 or compatible)
+   # Install Gradle if not already installed
+   # On macOS with Homebrew:
+   brew install gradle
+   
+   # On Linux (Debian/Ubuntu):
+   sudo apt-get install gradle
+   
+   # On Windows with Chocolatey:
+   choco install gradle
+   
+   # Generate wrapper using system Gradle (version 8.2 or compatible)
    gradle wrapper --gradle-version 8.2
    
    # This creates:
@@ -99,18 +110,19 @@ Before building, ensure you have:
    # - gradle/wrapper/gradle-wrapper.jar
    ```
    
-   If you don't have Gradle installed system-wide, you can manually create the wrapper scripts:
-   ```bash
-   # For Linux/Mac - create gradlew
-   cat > gradlew << 'EOF'
-   #!/bin/sh
-   exec java -jar "$(dirname "$0")/gradle/wrapper/gradle-wrapper.jar" "$@"
-   EOF
-   chmod +x gradlew
+   **Option 2: Using Gradle without installing**
    
-   # Download gradle-wrapper.jar
-   mkdir -p gradle/wrapper
-   curl -L https://raw.githubusercontent.com/gradle/gradle/master/gradle/wrapper/gradle-wrapper.jar -o gradle/wrapper/gradle-wrapper.jar
+   If you cannot install Gradle system-wide, download and use it temporarily:
+   ```bash
+   # Download Gradle distribution
+   curl -L https://services.gradle.org/distributions/gradle-8.2-bin.zip -o gradle.zip
+   unzip gradle.zip
+   
+   # Use downloaded Gradle to generate wrapper
+   ./gradle-8.2/bin/gradle wrapper --gradle-version 8.2
+   
+   # Clean up temporary Gradle
+   rm -rf gradle-8.2 gradle.zip
    ```
 
 ### Building the APK
@@ -219,10 +231,16 @@ export ANDROID_SDK_ROOT=~/android-sdk
 
 #### "Could not find or load main class org.gradle.wrapper.GradleWrapperMain"
 ```bash
-# Solution: Re-download gradle-wrapper.jar
+# Solution: Regenerate the Gradle wrapper
+# Install Gradle if needed, then run:
+gradle wrapper --gradle-version 8.2
+
+# Or download Gradle wrapper JAR from official distribution (version 8.2)
 rm gradle/wrapper/gradle-wrapper.jar
-curl -L https://raw.githubusercontent.com/gradle/gradle/master/gradle/wrapper/gradle-wrapper.jar \
-  -o gradle/wrapper/gradle-wrapper.jar
+curl -L https://services.gradle.org/distributions/gradle-8.2-bin.zip -o temp-gradle.zip
+unzip -j temp-gradle.zip "gradle-8.2/lib/gradle-wrapper-*.jar" -d gradle/wrapper/
+mv gradle/wrapper/gradle-wrapper-*.jar gradle/wrapper/gradle-wrapper.jar
+rm temp-gradle.zip
 ```
 
 #### "Unsupported Java version"
