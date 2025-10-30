@@ -94,19 +94,45 @@ class DetailsFragment : DetailsSupportFragment() {
         
         // Handle action clicks
         onItemViewClickedListener = OnItemViewClickedListener { _, item, _, _ ->
-            if (item is Action && item.id == 1L) {
-                playChannel()
+            try {
+                if (item is Action && item.id == 1L) {
+                    playChannel()
+                }
+            } catch (e: Exception) {
+                android.widget.Toast.makeText(
+                    requireContext(),
+                    "Error: ${e.message}",
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
     
     private fun playChannel() {
+        // Validate stream URL before attempting playback
+        if (channel.streamUrl.isEmpty()) {
+            android.widget.Toast.makeText(
+                requireContext(),
+                "Error: Stream URL not available for this content",
+                android.widget.Toast.LENGTH_LONG
+            ).show()
+            return
+        }
+        
         repository.addToRecentlyWatched(channel.id)
         
-        val intent = Intent(requireContext(), PlaybackActivity::class.java).apply {
-            putExtra(PlaybackActivity.EXTRA_CHANNEL, channel)
+        try {
+            val intent = Intent(requireContext(), PlaybackActivity::class.java).apply {
+                putExtra(PlaybackActivity.EXTRA_CHANNEL, channel)
+            }
+            startActivity(intent)
+        } catch (e: Exception) {
+            android.widget.Toast.makeText(
+                requireContext(),
+                "Error starting playback: ${e.message}",
+                android.widget.Toast.LENGTH_LONG
+            ).show()
         }
-        startActivity(intent)
     }
     
     inner class DetailsDescriptionPresenter : AbstractDetailsDescriptionPresenter() {

@@ -107,6 +107,13 @@ class PlaybackActivity : AppCompatActivity() {
     }
     
     private fun setupPlayer() {
+        // Validate stream URL before setting up player
+        if (channel?.streamUrl.isNullOrEmpty()) {
+            Toast.makeText(this, "Error: Invalid stream URL", Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
+        
         // Configure custom load control for better buffering
         val loadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(
@@ -136,20 +143,42 @@ class PlaybackActivity : AppCompatActivity() {
             // Initialize track selection dialog
             trackSelectionDialog = TrackSelectionDialog(this, exoPlayer)
             
-            // Set up media item
-            val mediaItem = MediaItem.fromUri(channel!!.streamUrl)
-            exoPlayer.setMediaItem(mediaItem)
-            exoPlayer.prepare()
-            exoPlayer.playWhenReady = true
+            // Set up media item with proper error handling
+            try {
+                val mediaItem = MediaItem.fromUri(channel!!.streamUrl)
+                exoPlayer.setMediaItem(mediaItem)
+                exoPlayer.prepare()
+                exoPlayer.playWhenReady = true
+            } catch (e: Exception) {
+                Toast.makeText(this, "Error loading stream: ${e.message}", Toast.LENGTH_LONG).show()
+                finish()
+                return
+            }
             
             // Add listener for playback events
             exoPlayer.addListener(object : Player.Listener {
                 override fun onPlayerError(error: PlaybackException) {
+                    val errorMessage = when (error.errorCode) {
+                        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED,
+                        PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT -> 
+                            "Network error: Please check your internet connection"
+                        PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND,
+                        PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS -> 
+                            "Stream not found: The content may no longer be available"
+                        PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED,
+                        PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED ->
+                            "Invalid stream format: Cannot play this content"
+                        else -> "Playback error: ${error.message ?: "Unknown error"}"
+                    }
+                    
                     Toast.makeText(
                         this@PlaybackActivity,
-                        "Playback error: ${error.message}",
+                        errorMessage,
                         Toast.LENGTH_LONG
                     ).show()
+                    
+                    // Close activity after showing error
+                    handler.postDelayed({ finish() }, 3000)
                 }
                 
                 override fun onPlaybackStateChanged(state: Int) {
@@ -417,28 +446,40 @@ class PlaybackActivity : AppCompatActivity() {
         
         if (nextEpisode != null) {
             val nextUrl = seriesPlaybackHelper?.getEpisodeStreamUrl(nextEpisode)
-            if (nextUrl != null) {
+            if (nextUrl != null && nextUrl.isNotEmpty()) {
                 player?.let { p ->
-                    val mediaItem = MediaItem.fromUri(nextUrl)
-                    p.setMediaItem(mediaItem)
-                    p.prepare()
-                    p.playWhenReady = true
-                    
-                    // Update channel info
-                    channel = channel?.copy(
-                        name = seriesPlaybackHelper?.getEpisodeTitle(nextEpisode) ?: nextEpisode.title,
-                        streamUrl = nextUrl,
-                        seasonNumber = nextEpisode.season,
-                        episodeNumber = nextEpisode.episode_num
-                    )
-                    
-                    // Update UI
-                    binding.channelName.text = channel?.name
-                    binding.channelName.visibility = View.VISIBLE
-                    binding.channelName.postDelayed({
-                        binding.channelName.visibility = View.GONE
-                    }, 3000)
+                    try {
+                        val mediaItem = MediaItem.fromUri(nextUrl)
+                        p.setMediaItem(mediaItem)
+                        p.prepare()
+                        p.playWhenReady = true
+                        
+                        // Update channel info
+                        channel = channel?.copy(
+                            name = seriesPlaybackHelper?.getEpisodeTitle(nextEpisode) ?: nextEpisode.title,
+                            streamUrl = nextUrl,
+                            seasonNumber = nextEpisode.season,
+                            episodeNumber = nextEpisode.episode_num
+                        )
+                        
+                        // Update UI
+                        binding.channelName.text = channel?.name
+                        binding.channelName.visibility = View.VISIBLE
+                        binding.channelName.postDelayed({
+                            binding.channelName.visibility = View.GONE
+                        }, 3000)
+                    } catch (e: Exception) {
+                        Toast.makeText(
+                            this,
+                            "Error loading next episode: ${e.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        finish()
+                    }
                 }
+            } else {
+                Toast.makeText(this, "Next episode URL not available", Toast.LENGTH_SHORT).show()
+                finish()
             }
         } else {
             finish()

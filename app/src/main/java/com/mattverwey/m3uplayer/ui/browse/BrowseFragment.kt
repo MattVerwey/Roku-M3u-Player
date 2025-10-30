@@ -54,13 +54,21 @@ class BrowseFragment : BrowseSupportFragment() {
     private fun setupEventListeners() {
         // Handle item clicks
         onItemViewClickedListener = OnItemViewClickedListener { _, item, _, _ ->
-            if (item is Channel) {
-                // For live TV, play directly. For VOD, show details first
-                if (item.category == ChannelCategory.LIVE_TV) {
-                    playChannel(item)
-                } else {
-                    showDetails(item)
+            try {
+                if (item is Channel) {
+                    // For live TV, play directly. For VOD, show details first
+                    if (item.category == ChannelCategory.LIVE_TV) {
+                        playChannel(item)
+                    } else {
+                        showDetails(item)
+                    }
                 }
+            } catch (e: Exception) {
+                Toast.makeText(
+                    requireContext(),
+                    "Error: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
         
@@ -152,19 +160,51 @@ class BrowseFragment : BrowseSupportFragment() {
     }
     
     private fun playChannel(channel: Channel) {
+        // Validate stream URL before attempting playback
+        if (channel.streamUrl.isEmpty()) {
+            Toast.makeText(
+                requireContext(),
+                "Error: Invalid stream URL for this channel",
+                Toast.LENGTH_LONG
+            ).show()
+            return
+        }
+        
+        // Series content should not be played directly, show details instead
+        if (channel.category == ChannelCategory.SERIES) {
+            showDetails(channel)
+            return
+        }
+        
         repository.addToRecentlyWatched(channel.id)
         
-        val intent = Intent(requireContext(), PlaybackActivity::class.java).apply {
-            putExtra(PlaybackActivity.EXTRA_CHANNEL, channel)
+        try {
+            val intent = Intent(requireContext(), PlaybackActivity::class.java).apply {
+                putExtra(PlaybackActivity.EXTRA_CHANNEL, channel)
+            }
+            startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(
+                requireContext(),
+                "Error starting playback: ${e.message}",
+                Toast.LENGTH_LONG
+            ).show()
         }
-        startActivity(intent)
     }
     
     private fun showDetails(channel: Channel) {
-        val intent = Intent(requireContext(), DetailsActivity::class.java).apply {
-            putExtra(DetailsActivity.EXTRA_CHANNEL, channel)
+        try {
+            val intent = Intent(requireContext(), DetailsActivity::class.java).apply {
+                putExtra(DetailsActivity.EXTRA_CHANNEL, channel)
+            }
+            startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(
+                requireContext(),
+                "Error opening details: ${e.message}",
+                Toast.LENGTH_LONG
+            ).show()
         }
-        startActivity(intent)
     }
     
     private fun showProgressBar() {
