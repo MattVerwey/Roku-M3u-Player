@@ -11,10 +11,13 @@ import android.view.View
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.mattverwey.m3uplayer.R
 import com.mattverwey.m3uplayer.data.model.Channel
 import com.mattverwey.m3uplayer.databinding.ActivityPlaybackBinding
@@ -56,7 +59,30 @@ class PlaybackActivity : AppCompatActivity() {
     }
     
     private fun setupPlayer() {
-        player = ExoPlayer.Builder(this).build().also { exoPlayer ->
+        // Configure custom load control for better buffering
+        val loadControl = DefaultLoadControl.Builder()
+            .setBufferDurationsMs(
+                DefaultLoadControl.DEFAULT_MIN_BUFFER_MS,
+                60000, // Max buffer 60 seconds (increased from default 50s)
+                2500,  // Buffer for playback 2.5 seconds (increased from default 2.5s)
+                5000   // Buffer for playback after rebuffer 5 seconds (increased from default 5s)
+            )
+            .setPrioritizeTimeOverSizeThresholds(true)
+            .build()
+        
+        // Configure track selector for adaptive streaming
+        val trackSelector = DefaultTrackSelector(this).apply {
+            setParameters(
+                buildUponParameters()
+                    .setMaxVideoSizeSd() // Start with SD quality for faster startup
+                    .setForceHighestSupportedBitrate(false) // Allow adaptive bitrate
+            )
+        }
+        
+        player = ExoPlayer.Builder(this)
+            .setLoadControl(loadControl)
+            .setTrackSelector(trackSelector)
+            .build().also { exoPlayer ->
             binding.playerView.player = exoPlayer
             
             // Set up media item
