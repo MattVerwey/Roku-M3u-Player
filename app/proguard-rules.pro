@@ -29,10 +29,10 @@
 }
 
 # Security: Obfuscate sensitive credential classes
--keep class com.mattverwey.m3uplayer.data.model.XtreamCredentials {
+-keepclassmembers class com.mattverwey.m3uplayer.data.model.XtreamCredentials {
     <init>(...);
 }
--keep class com.mattverwey.m3uplayer.data.model.RecentlyWatched {
+-keepclassmembers class com.mattverwey.m3uplayer.data.model.RecentlyWatched {
     <init>(...);
 }
 
