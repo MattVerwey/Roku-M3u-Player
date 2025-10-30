@@ -92,7 +92,7 @@ data class XtreamSeries(
     val cast: String? = null,
     val director: String? = null,
     val genre: String? = null,
-    val releaseDate: String? = nu
+    val releaseDate: String? = null,
     val last_modified: String? = null,
     val rating: String? = null,
     val rating_5based: Double? = null,
