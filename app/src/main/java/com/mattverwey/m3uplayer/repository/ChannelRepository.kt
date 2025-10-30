@@ -154,6 +154,11 @@ class ChannelRepository(private val cacheManager: CacheManager) {
     fun addToRecentlyWatched(channelId: String) {
         cacheManager.addRecentlyWatched(channelId)
     }
+    
+    // Clear cache
+    fun clearCache() {
+        cacheManager.clearCache()
+    }
 }
 
 // Extension functions to convert Xtream models to Channel

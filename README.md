@@ -23,7 +23,9 @@ A modern IPTV player for Amazon Fire TV Cube and Fire TV devices with support fo
 ### Video Playback
 - Powered by ExoPlayer for robust streaming
 - Support for multiple formats: HLS, RTMP, MP4, MKV, and more
-- Adaptive streaming for best quality
+- **Optimized buffering**: 60-second buffer for smooth playback
+- **Adaptive streaming**: Starts SD, upgrades to HD automatically
+- **Fast startup**: 2.5-second pre-buffer for quick playback
 - Picture-in-Picture mode for multitasking
 - Playback controls optimized for Fire TV remote
 
@@ -47,6 +49,32 @@ A modern IPTV player for Amazon Fire TV Cube and Fire TV devices with support fo
 - **Image Loading**: Coil
 - **Security**: AndroidX Security (EncryptedSharedPreferences)
 - **Architecture**: MVVM with Repository pattern
+
+## Documentation
+
+### Testing and Guides
+- 📘 **[Fire TV Testing Guide](FIRE_TV_TESTING_GUIDE.md)** - Complete guide for testing on Amazon Fire TV Cube
+  - Installation methods (ADB, Downloader app)
+  - Comprehensive testing checklist
+  - UI and performance testing procedures
+  - Troubleshooting common issues
+  
+- 🎨 **[UI Design Documentation](UI_DESIGN_DOCUMENTATION.md)** - Detailed UI specifications
+  - Modern and sleek design principles
+  - Screen-by-screen design breakdown
+  - Color palette and typography
+  - Responsive design guidelines
+  
+- ⚡ **[Buffering Optimization](BUFFERING_OPTIMIZATION.md)** - Video buffering improvements
+  - Technical implementation details
+  - Performance benchmarks
+  - Troubleshooting buffering issues
+  - Best practices for smooth playback
+
+### Migration Guides
+- 📄 **[Migration Guide](MIGRATION_GUIDE.md)** - Roku to Android TV migration
+- 📄 **[Implementation Summary](IMPLEMENTATION_SUMMARY.md)** - Technical implementation details
+- 📄 **[Legacy Roku Files](LEGACY_ROKU_FILES.md)** - Original Roku codebase reference
 
 ## Setup & Installation
 
@@ -87,6 +115,8 @@ adb connect <FIRE_TV_IP>:5555
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
+**For detailed installation instructions and testing procedures, see [FIRE_TV_TESTING_GUIDE.md](FIRE_TV_TESTING_GUIDE.md)**
+
 ## Usage
 
 ### First Time Setup
@@ -102,7 +132,10 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 - **Select/Enter**: Play channel or view details
 - **Back**: Return to previous screen
 - **Home**: Enter Picture-in-Picture mode (during playback)
-- **Options**: Access settings (from browse screen)
+- **Menu** (3 lines button): Access quick options menu
+  - Refresh Channels
+  - Clear Cache
+  - Logout
 
 ### Picture-in-Picture
 
@@ -193,7 +226,15 @@ private const val MAX_RECENTLY_WATCHED = 50
 ### Playback Issues
 - Check internet connection
 - Verify stream URL is accessible
-- Try refreshing the playlist (pull down on browse screen)
+- Try refreshing the playlist (Menu → Refresh Channels)
+- Clear cache if experiencing issues (Menu → Clear Cache)
+
+### Buffering Issues
+- Ensure minimum 10 Mbps internet connection for HD
+- Use Ethernet connection instead of WiFi (recommended for Fire TV Cube)
+- Position Fire TV closer to router
+- Close other apps consuming bandwidth
+- See [BUFFERING_OPTIMIZATION.md](BUFFERING_OPTIMIZATION.md) for detailed troubleshooting
 
 ### Login Issues
 - Ensure server URL includes http:// or https://
@@ -206,6 +247,13 @@ private const val MAX_RECENTLY_WATCHED = 50
 
 ## Performance Optimization
 
+### Video Playback
+- **Custom buffering**: 60-second buffer for smooth playback
+- **Adaptive streaming**: Starts with SD, upgrades to HD automatically
+- **Quick startup**: 2.5-second pre-buffer for fast playback start
+- See [BUFFERING_OPTIMIZATION.md](BUFFERING_OPTIMIZATION.md) for details
+
+### General Performance
 - Lazy loading of channel lists
 - Image caching with Coil
 - Background thread operations with Coroutines
