@@ -7,7 +7,6 @@ end sub
 sub getContent()
 	feedurl = m.global.feedurl
 
-	m.port = CreateObject ("roMessagePort")
 	searchRequest = CreateObject("roUrlTransfer")
 	searchRequest.setURL(feedurl)
 	searchRequest.EnableEncodings(true)
