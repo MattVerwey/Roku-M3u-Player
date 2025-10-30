@@ -405,10 +405,14 @@ class PlaybackActivity : AppCompatActivity() {
             finish()
             return
         }
-        
+
+        // Extract non-null values after null check
+        val seasonNumber = channel!!.seasonNumber!!
+        val episodeNumber = channel!!.episodeNumber!!
+
         val nextEpisode = seriesPlaybackHelper?.getNextEpisode(
-            channel!!.seasonNumber!!,
-            channel!!.episodeNumber!!
+            seasonNumber,
+            episodeNumber
         )
         
         if (nextEpisode != null) {
