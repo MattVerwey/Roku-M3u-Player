@@ -13,4 +13,8 @@
     <dimen name="text_size_title">24sp</dimen>
     <dimen name="text_size_body">16sp</dimen>
     <dimen name="text_size_caption">14sp</dimen>
+    
+    <!-- Details poster dimensions (16:9 aspect ratio for TV display) -->
+    <dimen name="details_poster_width">480dp</dimen>
+    <dimen name="details_poster_height">270dp</dimen>
 </resources>

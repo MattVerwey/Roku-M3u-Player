@@ -113,19 +113,25 @@ class BrowseFragment : BrowseSupportFragment() {
         
         // HOME PAGE SECTIONS - Create a proper landing page
         
-        // 1. Recently Watched - Show at the top for easy access
+        // 1. Favorites - Show user's favorite content first
+        val favorites = repository.getFavoriteChannels(channels)
+        if (favorites.isNotEmpty()) {
+            addRow("⭐ Favorites", favorites)
+        }
+        
+        // 2. Recently Watched - Show at the top for easy access
         val recentlyWatched = repository.getRecentlyWatchedChannels(channels)
         if (recentlyWatched.isNotEmpty()) {
             addRow("⏱️ Recently Watched", recentlyWatched.take(20))
         }
         
-        // 2. Recommendations - Based on watch history
+        // 3. Recommendations - Based on watch history
         val recommendations = repository.getRecommendations(channels, maxRecommendations = 20)
         if (recommendations.isNotEmpty()) {
             addRow("💡 Recommended For You", recommendations)
         }
         
-        // 3. Latest Added - Recently added content
+        // 4. Latest Added - Recently added content
         val latestAdded = repository.getLatestAddedContent(channels, limit = 20)
         if (latestAdded.isNotEmpty()) {
             addRow("🆕 Latest Added", latestAdded)
@@ -133,22 +139,22 @@ class BrowseFragment : BrowseSupportFragment() {
         
         // CATEGORY SECTIONS - Full browsable categories
         
-        // 4. Live TV - All live channels
+        // 5. Live TV - All live channels
         if (liveChannels.isNotEmpty()) {
             addRow("📺 Live TV", liveChannels.take(30))
         }
         
-        // 5. Movies - All movies
+        // 6. Movies - All movies
         if (movies.isNotEmpty()) {
             addRow("🎬 Movies", movies.take(30))
         }
         
-        // 6. Series - All series
+        // 7. Series - All series
         if (series.isNotEmpty()) {
             addRow("📺 Series", series.take(30))
         }
         
-        // 7. Settings - Empty row for settings menu
+        // 8. Settings - Empty row for settings menu
         val emptyRow = ArrayObjectAdapter(ChannelCardPresenter())
         val settingsHeader = HeaderItem(rowsAdapter.size().toLong(), "⚙️ Settings")
         rowsAdapter.add(ListRow(settingsHeader, emptyRow))
