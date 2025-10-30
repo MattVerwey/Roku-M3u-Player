@@ -225,7 +225,6 @@ class CacheManager(context: Context) {
     fun secureLogout() {
         clearAllCredentials()
         clearCache()
-        // Force garbage collection to clear sensitive data from memory
-        System.gc()
+        // Note: JVM memory management is automatic. Explicit garbage collection is not guaranteed to clear sensitive data from memory.
     }
 }
