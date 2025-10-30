@@ -15,8 +15,8 @@ import com.mattverwey.m3uplayer.data.model.Channel
 import com.mattverwey.m3uplayer.data.model.ChannelCategory
 import com.mattverwey.m3uplayer.repository.ChannelRepository
 import com.mattverwey.m3uplayer.ui.details.DetailsActivity
-import com.mattverwey.m3uplayer.ui.login.LoginActivity
 import com.mattverwey.m3uplayer.ui.playback.PlaybackActivity
+import com.mattverwey.m3uplayer.ui.settings.SettingsActivity
 import kotlinx.coroutines.launch
 
 class BrowseFragment : BrowseSupportFragment() {
@@ -169,8 +169,7 @@ class BrowseFragment : BrowseSupportFragment() {
     private fun showOptionsMenu() {
         val options = arrayOf(
             "Refresh Channels",
-            "Clear Cache",
-            "Logout"
+            "Privacy & Security Settings"
         )
         
         AlertDialog.Builder(requireContext())
@@ -178,8 +177,7 @@ class BrowseFragment : BrowseSupportFragment() {
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> refreshChannels()
-                    1 -> clearCache()
-                    2 -> logout()
+                    1 -> openSettings()
                 }
             }
             .setNegativeButton("Cancel", null)
@@ -192,24 +190,7 @@ class BrowseFragment : BrowseSupportFragment() {
         loadChannels()
     }
     
-    private fun clearCache() {
-        repository.clearCache()
-        Toast.makeText(requireContext(), "Cache cleared", Toast.LENGTH_SHORT).show()
-        loadChannels()
-    }
-    
-    private fun logout() {
-        AlertDialog.Builder(requireContext())
-            .setTitle("Logout")
-            .setMessage("Are you sure you want to logout?")
-            .setPositiveButton("Yes") { _, _ ->
-                repository.clearCache()
-                val intent = Intent(requireContext(), LoginActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
-                requireActivity().finish()
-            }
-            .setNegativeButton("No", null)
-            .show()
+    private fun openSettings() {
+        SettingsActivity.start(requireContext())
     }
 }

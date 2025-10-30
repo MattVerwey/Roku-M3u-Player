@@ -1,5 +1,6 @@
 package com.mattverwey.m3uplayer.ui
 
+import android.app.AlertDialog
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import com.mattverwey.m3uplayer.R
@@ -15,10 +16,15 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         
-        cacheManager = CacheManager(this)
-        
-        if (savedInstanceState == null) {
-            checkLoginStatus()
+        try {
+            cacheManager = CacheManager(this)
+            
+            if (savedInstanceState == null) {
+                checkLoginStatus()
+            }
+        } catch (e: SecurityException) {
+            // Show error dialog and exit if encryption is not available
+            showEncryptionUnavailableDialog(e.message ?: "Encryption not available")
         }
     }
     
@@ -36,5 +42,16 @@ class MainActivity : FragmentActivity() {
                 .replace(R.id.main_container, BrowseFragment())
                 .commit()
         }
+    }
+    
+    private fun showEncryptionUnavailableDialog(message: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Security Feature Unavailable")
+            .setMessage("This app requires secure storage to protect your credentials, but your device does not support it.\n\n$message")
+            .setCancelable(false)
+            .setPositiveButton("Exit") { _, _ ->
+                finish()
+            }
+            .show()
     }
 }

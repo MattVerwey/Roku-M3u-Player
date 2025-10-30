@@ -18,9 +18,16 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Allow cleartext traffic in debug for testing
+            manifestPlaceholders = [usesCleartextTraffic: "true"]
+        }
         release {
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // Restrict cleartext traffic in release for security
+            manifestPlaceholders = [usesCleartextTraffic: "false"]
         }
     }
     
@@ -78,6 +85,9 @@ dependencies {
     
     // Local Storage
     implementation 'androidx.preference:preference-ktx:1.2.1'
+    
+    // Security - Encrypted SharedPreferences
+    implementation 'androidx.security:security-crypto:1.1.0-alpha06'
     
     // Room Database (for caching)
     implementation 'androidx.room:room-runtime:2.6.1'

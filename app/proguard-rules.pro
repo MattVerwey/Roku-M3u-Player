@@ -18,3 +18,28 @@
 # ExoPlayer
 -keep class androidx.media3.** { *; }
 -dontwarn androidx.media3.**
+
+# Security: Remove all logging in release builds
+-assumenosideeffects class android.util.Log {
+    public static *** d(...);
+    public static *** v(...);
+    public static *** i(...);
+    public static *** w(...);
+    public static *** e(...);
+}
+
+# Security: Obfuscate sensitive credential classes
+-keepclassmembers class com.mattverwey.m3uplayer.data.model.XtreamCredentials {
+    <init>(...);
+}
+-keepclassmembers class com.mattverwey.m3uplayer.data.model.RecentlyWatched {
+    <init>(...);
+}
+
+# Security: Keep EncryptedSharedPreferences
+-keep class androidx.security.crypto.** { *; }
+-keep class com.google.crypto.tink.** { *; }
+
+# Prevent stack trace information leakage
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile

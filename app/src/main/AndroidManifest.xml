@@ -15,13 +15,13 @@
         android:required="true" />
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:banner="@mipmap/ic_banner"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.Leanback"
-        android:usesCleartextTraffic="true"
+        android:usesCleartextTraffic="${usesCleartextTraffic}"
         tools:targetApi="31">
 
         <!-- Main Activity -->
@@ -53,6 +53,13 @@
         <!-- Login Activity -->
         <activity
             android:name=".ui.login.LoginActivity"
+            android:configChanges="keyboard|keyboardHidden|navigation"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+
+        <!-- Settings Activity -->
+        <activity
+            android:name=".ui.settings.SettingsActivity"
             android:configChanges="keyboard|keyboardHidden|navigation"
             android:screenOrientation="landscape"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
