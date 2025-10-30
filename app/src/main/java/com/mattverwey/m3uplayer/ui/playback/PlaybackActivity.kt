@@ -5,12 +5,18 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Rational
 import android.view.KeyEvent
 import android.view.View
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
@@ -20,7 +26,13 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import com.mattverwey.m3uplayer.R
 import com.mattverwey.m3uplayer.data.model.Channel
+import com.mattverwey.m3uplayer.data.model.ChannelCategory
+import com.mattverwey.m3uplayer.data.model.EPGProgram
 import com.mattverwey.m3uplayer.databinding.ActivityPlaybackBinding
+import com.mattverwey.m3uplayer.network.EPGService
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 class PlaybackActivity : AppCompatActivity() {
     
@@ -28,9 +40,18 @@ class PlaybackActivity : AppCompatActivity() {
     private var player: ExoPlayer? = null
     private var channel: Channel? = null
     private var isInPipMode = false
+    private lateinit var trackSelectionDialog: TrackSelectionDialog
+    private lateinit var epgService: EPGService
+    private var epgData: Map<String, List<EPGProgram>> = emptyMap()
+    private var controlsVisible = false
+    private val handler = Handler(Looper.getMainLooper())
+    private var hideControlsRunnable: Runnable? = null
     
     companion object {
         const val EXTRA_CHANNEL = "extra_channel"
+        const val EXTRA_NEXT_EPISODE_URL = "extra_next_episode_url"
+        private const val SEEK_INCREMENT_MS = 10000L // 10 seconds
+        private const val CONTROLS_HIDE_DELAY_MS = 5000L // 5 seconds
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,8 +75,12 @@ class PlaybackActivity : AppCompatActivity() {
             return
         }
         
+        epgService = EPGService()
+        
         setupPlayer()
         setupUI()
+        setupControls()
+        loadEPGData()
     }
     
     private fun setupPlayer() {
@@ -85,6 +110,9 @@ class PlaybackActivity : AppCompatActivity() {
             .build().also { exoPlayer ->
             binding.playerView.player = exoPlayer
             
+            // Initialize track selection dialog
+            trackSelectionDialog = TrackSelectionDialog(this, exoPlayer)
+            
             // Set up media item
             val mediaItem = MediaItem.fromUri(channel!!.streamUrl)
             exoPlayer.setMediaItem(mediaItem)
@@ -110,7 +138,7 @@ class PlaybackActivity : AppCompatActivity() {
                             binding.progressBar.visibility = View.GONE
                         }
                         Player.STATE_ENDED -> {
-                            finish()
+                            handlePlaybackEnded()
                         }
                     }
                 }
@@ -125,6 +153,233 @@ class PlaybackActivity : AppCompatActivity() {
         binding.channelName.postDelayed({
             binding.channelName.visibility = View.GONE
         }, 3000)
+        
+        // Initially hide controls
+        hideControls()
+    }
+    
+    private fun setupControls() {
+        // Get control views
+        val playerControls = findViewById<LinearLayout>(R.id.player_controls)
+        val btnSubtitles = findViewById<Button>(R.id.btn_subtitles)
+        val btnAudioTrack = findViewById<Button>(R.id.btn_audio_track)
+        val btnVideoQuality = findViewById<Button>(R.id.btn_video_quality)
+        val btnRewind = findViewById<Button>(R.id.btn_rewind)
+        val btnPlayPause = findViewById<Button>(R.id.exo_play_pause)
+        val btnFastForward = findViewById<Button>(R.id.btn_fast_forward)
+        val btnTvGuide = findViewById<Button>(R.id.btn_tv_guide)
+        val btnPlayNext = findViewById<Button>(R.id.btn_play_next)
+        
+        // Setup subtitle button
+        btnSubtitles.setOnClickListener {
+            trackSelectionDialog.showTrackSelectionDialog(TrackSelectionDialog.TrackType.SUBTITLE)
+        }
+        
+        // Setup audio track button
+        btnAudioTrack.setOnClickListener {
+            trackSelectionDialog.showTrackSelectionDialog(TrackSelectionDialog.TrackType.AUDIO)
+        }
+        
+        // Setup video quality button
+        btnVideoQuality.setOnClickListener {
+            trackSelectionDialog.showTrackSelectionDialog(TrackSelectionDialog.TrackType.VIDEO)
+        }
+        
+        // Setup rewind button
+        btnRewind.setOnClickListener {
+            player?.let { p ->
+                val newPosition = (p.currentPosition - SEEK_INCREMENT_MS).coerceAtLeast(0)
+                p.seekTo(newPosition)
+            }
+            resetHideControlsTimer()
+        }
+        
+        // Setup play/pause button
+        btnPlayPause.setOnClickListener {
+            player?.let { p ->
+                if (p.isPlaying) {
+                    p.pause()
+                    btnPlayPause.text = getString(R.string.play)
+                } else {
+                    p.play()
+                    btnPlayPause.text = getString(R.string.pause)
+                }
+            }
+            resetHideControlsTimer()
+        }
+        
+        // Setup fast forward button
+        btnFastForward.setOnClickListener {
+            player?.let { p ->
+                val newPosition = (p.currentPosition + SEEK_INCREMENT_MS).coerceAtMost(p.duration)
+                p.seekTo(newPosition)
+            }
+            resetHideControlsTimer()
+        }
+        
+        // Setup TV guide button (only for live TV)
+        if (channel?.category == ChannelCategory.LIVE_TV) {
+            btnTvGuide.visibility = View.VISIBLE
+            btnTvGuide.setOnClickListener {
+                toggleTVGuide()
+                resetHideControlsTimer()
+            }
+        } else {
+            btnTvGuide.visibility = View.GONE
+        }
+        
+        // Setup play next button (only for series)
+        val nextEpisodeUrl = intent.getStringExtra(EXTRA_NEXT_EPISODE_URL)
+        if (channel?.category == ChannelCategory.SERIES && nextEpisodeUrl != null) {
+            btnPlayNext.visibility = View.VISIBLE
+            btnPlayNext.setOnClickListener {
+                playNextEpisode(nextEpisodeUrl)
+            }
+        } else {
+            btnPlayNext.visibility = View.GONE
+        }
+        
+        // Request focus on play/pause button
+        btnPlayPause.requestFocus()
+    }
+    
+    private fun showControls() {
+        val playerControls = findViewById<LinearLayout>(R.id.player_controls)
+        playerControls.visibility = View.VISIBLE
+        controlsVisible = true
+        resetHideControlsTimer()
+    }
+    
+    private fun hideControls() {
+        val playerControls = findViewById<LinearLayout>(R.id.player_controls)
+        playerControls.visibility = View.GONE
+        val tvGuideLayout = findViewById<LinearLayout>(R.id.tv_guide_layout)
+        tvGuideLayout.visibility = View.GONE
+        controlsVisible = false
+        hideControlsRunnable?.let { handler.removeCallbacks(it) }
+    }
+    
+    private fun toggleControls() {
+        if (controlsVisible) {
+            hideControls()
+        } else {
+            showControls()
+        }
+    }
+    
+    private fun resetHideControlsTimer() {
+        hideControlsRunnable?.let { handler.removeCallbacks(it) }
+        hideControlsRunnable = Runnable { hideControls() }
+        handler.postDelayed(hideControlsRunnable!!, CONTROLS_HIDE_DELAY_MS)
+    }
+    
+    private fun loadEPGData() {
+        if (channel?.category != ChannelCategory.LIVE_TV) return
+        
+        lifecycleScope.launch {
+            val result = epgService.downloadEPG()
+            result.onSuccess { data ->
+                epgData = data
+                updateTVGuide()
+            }.onFailure {
+                // EPG loading failed, but playback continues
+            }
+        }
+    }
+    
+    private fun toggleTVGuide() {
+        val tvGuideLayout = findViewById<LinearLayout>(R.id.tv_guide_layout)
+        if (tvGuideLayout.visibility == View.VISIBLE) {
+            tvGuideLayout.visibility = View.GONE
+        } else {
+            updateTVGuide()
+            tvGuideLayout.visibility = View.VISIBLE
+        }
+    }
+    
+    private fun updateTVGuide() {
+        val tvGuideLayout = findViewById<LinearLayout>(R.id.tv_guide_layout)
+        val currentProgramContainer = tvGuideLayout.findViewById<LinearLayout>(R.id.current_program_container)
+        val upcomingProgramContainer = tvGuideLayout.findViewById<LinearLayout>(R.id.upcoming_program_container)
+        val noEpgMessage = tvGuideLayout.findViewById<TextView>(R.id.no_epg_message)
+        
+        val (current, upcoming) = epgService.getCurrentAndUpcomingPrograms(
+            channel?.epgChannelId,
+            epgData
+        )
+        
+        if (current == null && upcoming == null) {
+            currentProgramContainer.visibility = View.GONE
+            upcomingProgramContainer.visibility = View.GONE
+            noEpgMessage.visibility = View.VISIBLE
+        } else {
+            noEpgMessage.visibility = View.GONE
+            
+            if (current != null) {
+                currentProgramContainer.visibility = View.VISIBLE
+                updateProgramInfo(currentProgramContainer, current)
+            } else {
+                currentProgramContainer.visibility = View.GONE
+            }
+            
+            if (upcoming != null) {
+                upcomingProgramContainer.visibility = View.VISIBLE
+                updateProgramInfo(upcomingProgramContainer, upcoming)
+            } else {
+                upcomingProgramContainer.visibility = View.GONE
+            }
+        }
+    }
+    
+    private fun updateProgramInfo(container: LinearLayout, program: EPGProgram) {
+        val titleView = container.findViewById<TextView>(
+            if (container.id == R.id.current_program_container) 
+                R.id.current_program_title 
+            else 
+                R.id.upcoming_program_title
+        )
+        val timeView = container.findViewById<TextView>(
+            if (container.id == R.id.current_program_container) 
+                R.id.current_program_time 
+            else 
+                R.id.upcoming_program_time
+        )
+        val descView = container.findViewById<TextView>(
+            if (container.id == R.id.current_program_container) 
+                R.id.current_program_description 
+            else 
+                R.id.upcoming_program_description
+        )
+        
+        titleView.text = program.title
+        timeView.text = formatProgramTime(program)
+        descView.text = program.description ?: ""
+    }
+    
+    private fun formatProgramTime(program: EPGProgram): String {
+        val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val startTime = timeFormat.format(Date(program.startTime))
+        val endTime = timeFormat.format(Date(program.endTime))
+        return "$startTime - $endTime"
+    }
+    
+    private fun playNextEpisode(nextEpisodeUrl: String) {
+        player?.let { p ->
+            val mediaItem = MediaItem.fromUri(nextEpisodeUrl)
+            p.setMediaItem(mediaItem)
+            p.prepare()
+            p.playWhenReady = true
+        }
+    }
+    
+    private fun handlePlaybackEnded() {
+        val nextEpisodeUrl = intent.getStringExtra(EXTRA_NEXT_EPISODE_URL)
+        if (channel?.category == ChannelCategory.SERIES && nextEpisodeUrl != null) {
+            // Auto-play next episode
+            playNextEpisode(nextEpisodeUrl)
+        } else {
+            finish()
+        }
     }
     
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -132,6 +387,40 @@ class PlaybackActivity : AppCompatActivity() {
             KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.KEYCODE_MEDIA_PAUSE -> {
                 player?.let {
                     if (it.isPlaying) it.pause() else it.play()
+                }
+                true
+            }
+            KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> {
+                if (!controlsVisible) {
+                    toggleControls()
+                    true
+                } else {
+                    false
+                }
+            }
+            KeyEvent.KEYCODE_BACK -> {
+                if (controlsVisible) {
+                    hideControls()
+                    true
+                } else {
+                    super.onKeyDown(keyCode, event)
+                }
+            }
+            KeyEvent.KEYCODE_MENU -> {
+                toggleControls()
+                true
+            }
+            KeyEvent.KEYCODE_MEDIA_REWIND -> {
+                player?.let { p ->
+                    val newPosition = (p.currentPosition - SEEK_INCREMENT_MS).coerceAtLeast(0)
+                    p.seekTo(newPosition)
+                }
+                true
+            }
+            KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> {
+                player?.let { p ->
+                    val newPosition = (p.currentPosition + SEEK_INCREMENT_MS).coerceAtMost(p.duration)
+                    p.seekTo(newPosition)
                 }
                 true
             }
@@ -190,6 +479,7 @@ class PlaybackActivity : AppCompatActivity() {
     
     override fun onDestroy() {
         super.onDestroy()
+        hideControlsRunnable?.let { handler.removeCallbacks(it) }
         releasePlayer()
     }
     

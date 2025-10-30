@@ -39,4 +39,21 @@
     <string name="loading_channels">Loading channels...</string>
     <string name="error_loading">Error loading content</string>
     <string name="retry">Retry</string>
+    
+    <!-- Playback Controls -->
+    <string name="subtitles">Subtitles</string>
+    <string name="subtitles_off">Subtitles Off</string>
+    <string name="audio_track">Audio Track</string>
+    <string name="video_quality">Video Quality</string>
+    <string name="track_selection">Track Selection</string>
+    <string name="no_tracks_available">No tracks available</string>
+    <string name="track_auto">Auto</string>
+    <string name="rewind">Rewind</string>
+    <string name="fast_forward">Fast Forward</string>
+    <string name="play_next_episode">Play Next Episode</string>
+    <string name="tv_guide">TV Guide</string>
+    <string name="now_playing">Now Playing</string>
+    <string name="up_next">Up Next</string>
+    <string name="no_epg_data">No program guide available</string>
+    <string name="loading_guide">Loading guide...</string>
 </resources>

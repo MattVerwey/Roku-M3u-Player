@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         app:resize_mode="fit"
         app:show_buffering="when_playing"
-        app:use_controller="true" />
+        app:use_controller="false" />
 
     <ProgressBar
         android:id="@+id/progress_bar"
@@ -30,5 +30,20 @@
         android:padding="@dimen/spacing_medium"
         android:textColor="@color/text_primary"
         android:textSize="@dimen/text_size_title" />
+
+    <!-- TV Guide Overlay -->
+    <include
+        android:id="@+id/tv_guide_layout"
+        layout="@layout/tv_guide_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom" />
+
+    <!-- Custom Player Controls -->
+    <include
+        android:id="@+id/player_controls"
+        layout="@layout/custom_player_controls"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </FrameLayout>

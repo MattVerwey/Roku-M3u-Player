@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tv_guide_overlay"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#CC000000"
+    android:padding="@dimen/spacing_large"
+    android:visibility="gone">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/tv_guide"
+        android:textColor="@color/text_primary"
+        android:textSize="@dimen/text_size_title"
+        android:textStyle="bold"
+        android:layout_marginBottom="@dimen/spacing_medium" />
+
+    <!-- Current Program -->
+    <LinearLayout
+        android:id="@+id/current_program_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/card_background"
+        android:padding="@dimen/spacing_medium"
+        android:layout_marginBottom="@dimen/spacing_medium">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/now_playing"
+            android:textColor="@color/accent"
+            android:textSize="@dimen/text_size_caption"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/current_program_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_size_body"
+            android:textStyle="bold"
+            android:layout_marginTop="@dimen/spacing_small" />
+
+        <TextView
+            android:id="@+id/current_program_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_size_caption"
+            android:layout_marginTop="4dp" />
+
+        <TextView
+            android:id="@+id/current_program_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_size_caption"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:layout_marginTop="@dimen/spacing_small" />
+    </LinearLayout>
+
+    <!-- Upcoming Program -->
+    <LinearLayout
+        android:id="@+id/upcoming_program_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/card_background"
+        android:padding="@dimen/spacing_medium">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/up_next"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_caption"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/upcoming_program_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_size_body"
+            android:textStyle="bold"
+            android:layout_marginTop="@dimen/spacing_small" />
+
+        <TextView
+            android:id="@+id/upcoming_program_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_size_caption"
+            android:layout_marginTop="4dp" />
+
+        <TextView
+            android:id="@+id/upcoming_program_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_size_caption"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:layout_marginTop="@dimen/spacing_small" />
+    </LinearLayout>
+
+    <!-- No EPG data message -->
+    <TextView
+        android:id="@+id/no_epg_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/no_epg_data"
+        android:textColor="@color/text_secondary"
+        android:textSize="@dimen/text_size_body"
+        android:gravity="center"
+        android:padding="@dimen/spacing_large"
+        android:visibility="gone" />
+
+</LinearLayout>
