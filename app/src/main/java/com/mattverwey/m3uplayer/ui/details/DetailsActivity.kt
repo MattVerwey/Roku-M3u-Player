@@ -1,8 +1,6 @@
 package com.mattverwey.m3uplayer.ui.details
 
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import androidx.core.content.ContextCompat
@@ -11,8 +9,6 @@ import androidx.leanback.app.DetailsSupportFragment
 import androidx.leanback.widget.*
 import coil.ImageLoader
 import coil.request.ImageRequest
-import coil.request.SuccessResult
-import coil.target.Target
 import com.mattverwey.m3uplayer.R
 import com.mattverwey.m3uplayer.data.cache.CacheManager
 import com.mattverwey.m3uplayer.data.model.Channel
@@ -133,19 +129,18 @@ class DetailsFragment : DetailsSupportFragment() {
                 val request = ImageRequest.Builder(requireContext())
                     .data(url)
                     .size(width, height)
-                    .target(object : Target {
-                        override fun onSuccess(result: Drawable) {
+                    .target(
+                        onSuccess = { result ->
                             detailsOverview.imageDrawable = result
-                        }
-                        
-                        override fun onError(error: Drawable?) {
+                        },
+                        onError = { error ->
                             // Use placeholder on error
                             detailsOverview.imageDrawable = ContextCompat.getDrawable(
                                 requireContext(), 
                                 R.drawable.ic_placeholder
                             )
                         }
-                    })
+                    )
                     .build()
                 
                 imageLoader.execute(request)
