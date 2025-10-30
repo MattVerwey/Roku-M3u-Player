@@ -183,15 +183,25 @@ Access settings via **Menu button** on main screen:
 
 🔒 **Comprehensive security measures protect your credentials and viewing privacy:**
 
-- **AES-256 Encryption**: All credentials encrypted using Android Keystore
-- **Secure Storage**: Xtream credentials, M3U URLs, and viewing history encrypted at rest
+### Stream Data Protection ✅
+- **Stream URLs Encrypted**: All stream URLs containing authentication tokens encrypted with AES-256
+- **Credentials Encrypted**: Xtream Codes and M3U credentials encrypted using Android Keystore
+- **Viewing History Encrypted**: What you watch is encrypted and user-controllable
+- **Network Security**: HTTPS enforced in release builds, cleartext traffic blocked
+- **No Data Leakage**: All sensitive data encrypted at rest and in transit
+
+### Additional Security
+- **AES-256 Encryption**: Enterprise-grade encryption for all sensitive data
+- **Hardware-Backed Keys**: Android Keystore with hardware security when available
 - **Privacy Controls**: User-controllable viewing history tracking
 - **Secure Logout**: Complete data wipe on logout with memory cleanup
 - **No Data Sharing**: All data stays on your device, no third-party tracking
-- **Network Security**: Cleartext traffic disabled in release builds
 - **Code Protection**: ProGuard removes logging and obfuscates sensitive code
 
-For detailed security information, see [SECURITY.md](SECURITY.md)
+### Security Documentation
+- 📄 **[SECURITY.md](SECURITY.md)** - Comprehensive security guide and best practices
+- 📄 **[SECURITY_VERIFICATION.md](SECURITY_VERIFICATION.md)** - Detailed security verification report
+- 📄 **[SECURITY_AUDIT_CHECKLIST.md](SECURITY_AUDIT_CHECKLIST.md)** - Complete security audit checklist
 
 ## Project Structure
 
