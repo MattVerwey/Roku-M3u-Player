@@ -137,25 +137,25 @@ class TrackSelectionDialog(
     }
     
     private fun selectTrack(trackType: TrackType, groupIndex: Int, trackIndex: Int) {
-        val trackSelector = player.trackSelector ?: return
+    val trackSelector = player.trackSelector ?: return
         
-        val parameters = trackSelector.parameters.buildUpon()
+    val parametersBuilder = trackSelector.parameters.buildUpon()
         
         when (trackType) {
             TrackType.SUBTITLE -> {
                 if (groupIndex == -1) {
                     // Disable subtitles
-                    parameters.setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
+                    parametersBuilder.setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
                 } else {
                     // Enable subtitles and select specific track
-                    parameters.setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
+                    parametersBuilder.setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
                     // Note: ExoPlayer will automatically select the best matching track
                 }
             }
             TrackType.AUDIO -> {
                 if (groupIndex == -1) {
                     // Auto selection - clear manual overrides
-                    parameters.clearOverridesOfType(C.TRACK_TYPE_AUDIO)
+                    parametersBuilder.clearOverridesOfType(C.TRACK_TYPE_AUDIO)
                 } else {
                     // Manual selection - override with specific track
                     val tracks = player.currentTracks
@@ -169,15 +169,15 @@ class TrackSelectionDialog(
                             trackGroup,
                             listOf(trackIndex.coerceIn(0, trackGroup.length - 1))
                         )
-                        parameters.clearOverridesOfType(C.TRACK_TYPE_AUDIO)
-                        parameters.addOverride(override)
+                        parametersBuilder.clearOverridesOfType(C.TRACK_TYPE_AUDIO)
+                        parametersBuilder.addOverride(override)
                     }
                 }
             }
             TrackType.VIDEO -> {
                 if (groupIndex == -1) {
                     // Auto selection - clear manual overrides
-                    parameters.clearOverridesOfType(C.TRACK_TYPE_VIDEO)
+                    parametersBuilder.clearOverridesOfType(C.TRACK_TYPE_VIDEO)
                 } else {
                     // Manual selection - override with specific track
                     val tracks = player.currentTracks
@@ -191,14 +191,14 @@ class TrackSelectionDialog(
                             trackGroup,
                             listOf(trackIndex.coerceIn(0, trackGroup.length - 1))
                         )
-                        parameters.clearOverridesOfType(C.TRACK_TYPE_VIDEO)
-                        parameters.addOverride(override)
+                        parametersBuilder.clearOverridesOfType(C.TRACK_TYPE_VIDEO)
+                        parametersBuilder.addOverride(override)
                     }
                 }
             }
         }
         
-        trackSelector.setParameters(parameters)
+        trackSelector.setParameters(parametersBuilder.build())
     }
     
     private fun showNoTracksDialog(trackType: TrackType) {

@@ -504,7 +504,7 @@ class PlaybackActivity : AppCompatActivity() {
             KeyEvent.KEYCODE_WINDOW -> {
                 // Enter PIP mode on Fire TV remote button
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    enterPictureInPictureMode()
+                    requestEnterPictureInPictureMode()
                 }
                 true
             }
@@ -513,7 +513,7 @@ class PlaybackActivity : AppCompatActivity() {
     }
     
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun enterPictureInPictureMode() {
+    private fun requestEnterPictureInPictureMode() {
         if (packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
             val params = PictureInPictureParams.Builder()
                 .setAspectRatio(Rational(16, 9))
@@ -543,7 +543,7 @@ class PlaybackActivity : AppCompatActivity() {
         super.onUserLeaveHint()
         // Automatically enter PIP when user presses home
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && player?.isPlaying == true) {
-            enterPictureInPictureMode()
+            requestEnterPictureInPictureMode()
         }
     }
     

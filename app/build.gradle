@@ -1,8 +1,8 @@
 plugins {
     id 'com.android.application'
-    id 'kotlin-android'
-    id 'kotlin-kapt'
-    id 'kotlin-parcelize'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.kapt'
+    id 'org.jetbrains.kotlin.plugin.parcelize'
 }
 
 android {
@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "com.mattverwey.m3uplayer"
-        minSdk 22  // Fire TV Stick (2nd Gen) and newer
+        minSdk 26  // Fire TV Cube/Stick (modern devices)
         targetSdk 34
         versionCode 1
         versionName "2.0.0"
@@ -47,10 +47,10 @@ android {
 
 dependencies {
     // Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.23"
     
     // Android TV Leanback
-    implementation 'androidx.leanback:leanback:1.2.0-alpha04'
+    implementation 'androidx.leanback:leanback:1.0.0'
     implementation 'androidx.leanback:leanback-preference:1.2.0-alpha04'
     
     // AndroidX Core

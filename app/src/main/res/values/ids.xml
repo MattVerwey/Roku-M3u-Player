@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="card_image" type="id"/>
+    <item name="card_info" type="id"/>
+    <item name="card_title" type="id"/>
+    <item name="card_subtitle" type="id"/>
+</resources>

@@ -35,13 +35,24 @@ class BrowseFragment : BrowseSupportFragment() {
     }
     
     private fun setupUI() {
-        title = getString(R.string.app_name)
+        title = "M3U Player"
+        
+        // Enable headers (left sidebar) - START WITH IT VISIBLE
         headersState = HEADERS_ENABLED
         isHeadersTransitionOnBackEnabled = true
-        brandColor = ContextCompat.getColor(requireContext(), R.color.primary)
+        
+        // Set colors - dark sidebar with white text
+        brandColor = android.graphics.Color.parseColor("#0D0D0D")
+        searchAffordanceColor = android.graphics.Color.WHITE
+        
+        // Disable search
+        setOnSearchClickedListener {
+            Toast.makeText(requireContext(), "Search not available", Toast.LENGTH_SHORT).show()
+        }
     }
     
     private fun setupEventListeners() {
+        // Handle item clicks
         onItemViewClickedListener = OnItemViewClickedListener { _, item, _, _ ->
             if (item is Channel) {
                 // For live TV, play directly. For VOD, show details first
@@ -50,6 +61,15 @@ class BrowseFragment : BrowseSupportFragment() {
                 } else {
                     showDetails(item)
                 }
+            }
+        }
+        
+        // Handle header (sidebar menu) selection
+        setOnItemViewSelectedListener { _, item, _, row ->
+            if (row is ListRow) {
+                val headerTitle = row.headerItem?.name ?: ""
+                // Just highlight the selected menu item
+                // Actual navigation happens when user presses RIGHT
             }
         }
     }
@@ -76,55 +96,47 @@ class BrowseFragment : BrowseSupportFragment() {
     }
     
     private fun setupRows(channels: List<Channel>) {
-        rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
+        val listRowPresenter = ListRowPresenter()
+        rowsAdapter = ArrayObjectAdapter(listRowPresenter)
         
-        // Recently Watched
-        val recentChannels = repository.getRecentlyWatchedChannels(channels)
-        if (recentChannels.isNotEmpty()) {
-            addRow(getString(R.string.recently_watched), recentChannels)
-        }
+        // Store channels for later use
+        allChannels = channels
         
-        // Latest Added (Movies & Series)
-        val latestAdded = repository.getLatestAddedContent(channels, limit = 30)
-        if (latestAdded.isNotEmpty()) {
-            addRow(getString(R.string.latest_added), latestAdded)
-        }
-        
-        // Live TV
+        // Separate channels by category
         val liveChannels = channels.filter { it.category == ChannelCategory.LIVE_TV }
-        if (liveChannels.isNotEmpty()) {
-            addRow(getString(R.string.live_tv), liveChannels)
-        }
-        
-        // Movies
         val movies = channels.filter { it.category == ChannelCategory.MOVIE }
-        if (movies.isNotEmpty()) {
-            addRow(getString(R.string.movies), movies)
-        }
-        
-        // Series
         val series = channels.filter { it.category == ChannelCategory.SERIES }
-        if (series.isNotEmpty()) {
-            addRow(getString(R.string.series), series)
-        }
         
-        // Group by category for Live TV
+        // Create MAIN MENU with only 4 options
+        // Each main menu item will show a placeholder row
+        
+        // 1. Live TV
         if (liveChannels.isNotEmpty()) {
-            val grouped = liveChannels.groupBy { it.groupTitle ?: "Other" }
-            grouped.forEach { (categoryName, categoryChannels) ->
-                if (categoryName != "Other" && categoryChannels.size > 3) {
-                    addRow(categoryName, categoryChannels)
-                }
-            }
+            val sampleLive = liveChannels.take(10)
+            addRow("📺 Live TV", sampleLive)
         }
         
-        // Recommended for You (at the bottom)
-        val recommendations = repository.getRecommendations(channels, maxRecommendations = 30)
-        if (recommendations.isNotEmpty()) {
-            addRow(getString(R.string.recommended), recommendations)
+        // 2. Movies
+        if (movies.isNotEmpty()) {
+            val sampleMovies = movies.take(10)
+            addRow("🎬 Movies", sampleMovies)
         }
+        
+        // 3. Series
+        if (series.isNotEmpty()) {
+            val sampleSeries = series.take(10)
+            addRow("📺 Series", sampleSeries)
+        }
+        
+        // 4. Settings (empty row for now)
+        val emptyRow = ArrayObjectAdapter(ChannelCardPresenter())
+        val settingsHeader = HeaderItem(rowsAdapter.size().toLong(), "⚙️ Settings")
+        rowsAdapter.add(ListRow(settingsHeader, emptyRow))
         
         adapter = rowsAdapter
+        
+        // Start with headers visible and focused
+        selectedPosition = 0
     }
     
     private fun addRow(title: String, channels: List<Channel>) {
@@ -163,19 +175,18 @@ class BrowseFragment : BrowseSupportFragment() {
         progressBarManager?.hide()
     }
     
-    // Handle Fire TV menu button (3 lines button)
     override fun onResume() {
         super.onResume()
-        view?.isFocusableInTouchMode = true
-        view?.requestFocus()
-        view?.setOnKeyListener { _, keyCode, event ->
-            if (event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_MENU) {
-                showOptionsMenu()
-                true
-            } else {
-                false
-            }
+        
+        // Always start with sidebar visible
+        if (!isShowingHeaders) {
+            startHeadersTransition(true)
         }
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        view?.setOnKeyListener(null)
     }
     
     private fun showOptionsMenu() {
