@@ -20,7 +20,8 @@ sub getContent()
 
 	text = searchRequest.getToString()
 
-	reHasGroups = CreateObject("roRegex", "group-title\=" + chr(34) + "?([^" + chr(34) + "]*)"+chr(34)+"?,","")
+	quote = chr(34)
+	reHasGroups = CreateObject("roRegex", "group-title\=" + quote + "?([^" + quote + "]*)" + quote + "?,","")
 	hasGroups = reHasGroups.isMatch(text)
 	print hasGroups
 
