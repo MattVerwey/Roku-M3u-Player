@@ -17,7 +17,7 @@ A modern IPTV player for Amazon Fire TV Cube and Fire TV devices with support fo
 - **Personalized Home Page** - Landing page with Recently Watched, Recommendations, and Latest Added
 - Modern card-based browsing with poster grid layout
 - Category organization (Live TV, Movies, Series)
-- **Smart Recommendations** - AI-powered content suggestions based on viewing history
+- **Smart Recommendations** - Intelligent content suggestions based on viewing history
 - Channel details screen with metadata
 - Smooth navigation optimized for D-pad control
 - Dark theme optimized for TV viewing
