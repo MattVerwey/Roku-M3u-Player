@@ -236,10 +236,9 @@ export ANDROID_SDK_ROOT=~/android-sdk
 gradle wrapper --gradle-version 8.2
 
 # Or download Gradle wrapper JAR from official distribution (version 8.2)
-rm gradle/wrapper/gradle-wrapper.jar
+rm -f gradle/wrapper/gradle-wrapper.jar
 curl -L https://services.gradle.org/distributions/gradle-8.2-bin.zip -o temp-gradle.zip
-unzip -j temp-gradle.zip "gradle-8.2/lib/gradle-wrapper-*.jar" -d gradle/wrapper/
-mv gradle/wrapper/gradle-wrapper-*.jar gradle/wrapper/gradle-wrapper.jar
+unzip -j temp-gradle.zip "gradle-8.2/lib/gradle-wrapper.jar" -d gradle/wrapper/
 rm temp-gradle.zip
 ```
 
