@@ -53,20 +53,6 @@ class BrowseFragment : BrowseSupportFragment() {
                 }
             }
         }
-        
-        // Handle menu button press to open settings
-        setOnKeyInterceptListener { _, keyCode, event ->
-            if (event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_MENU) {
-                openSettings()
-                true
-            } else {
-                false
-            }
-        }
-    }
-    
-    private fun openSettings() {
-        SettingsActivity.start(requireContext())
     }
     
     private fun loadChannels() {
@@ -184,8 +170,7 @@ class BrowseFragment : BrowseSupportFragment() {
     private fun showOptionsMenu() {
         val options = arrayOf(
             "Refresh Channels",
-            "Clear Cache",
-            "Logout"
+            "Privacy & Security Settings"
         )
         
         AlertDialog.Builder(requireContext())
@@ -193,8 +178,7 @@ class BrowseFragment : BrowseSupportFragment() {
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> refreshChannels()
-                    1 -> clearCache()
-                    2 -> logout()
+                    1 -> openSettings()
                 }
             }
             .setNegativeButton("Cancel", null)
@@ -207,24 +191,7 @@ class BrowseFragment : BrowseSupportFragment() {
         loadChannels()
     }
     
-    private fun clearCache() {
-        repository.clearCache()
-        Toast.makeText(requireContext(), "Cache cleared", Toast.LENGTH_SHORT).show()
-        loadChannels()
-    }
-    
-    private fun logout() {
-        AlertDialog.Builder(requireContext())
-            .setTitle("Logout")
-            .setMessage("Are you sure you want to logout?")
-            .setPositiveButton("Yes") { _, _ ->
-                repository.clearCache()
-                val intent = Intent(requireContext(), LoginActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
-                requireActivity().finish()
-            }
-            .setNegativeButton("No", null)
-            .show()
+    private fun openSettings() {
+        SettingsActivity.start(requireContext())
     }
 }
