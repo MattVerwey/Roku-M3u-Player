@@ -150,7 +150,7 @@ This document shows how data flows through the system for the new features.
 │    • cover (image URL)                       │
 │    • plot                                    │
 │    • genre                                   │
-│    • last_modified (timestamp) ⭐           │
+│    • last_modified (timestamp) [NEW]        │
 └────────┬─────────────────────────────────────┘
          │
          ▼
@@ -183,8 +183,8 @@ data class Channel(
     val streamUrl: String,       // Playback URL
     val category: ChannelCategory, // LIVE_TV, MOVIE, SERIES
     val genre: String?,          // "Crime, Drama, Thriller"
-    val added: String?,          // ⭐ "1698765432" (Unix timestamp)
-    val seriesId: Int?,          // ⭐ 123 (for series only)
+    val added: String?,          // [NEW] "1698765432" (Unix timestamp)
+    val seriesId: Int?,          // [NEW] 123 (for series only)
     // ... other fields
 )
 ```
@@ -195,7 +195,7 @@ data class RecentlyWatched(
     val channelId: String,       // Links to Channel.id
     val timestamp: Long,         // When watched (Unix ms)
     val lastPosition: Long,      // Playback position
-    val duration: Long          // Total duration
+    val duration: Long           // Total duration
 )
 ```
 
@@ -207,7 +207,7 @@ data class XtreamSeries(
     val cover: String?,          // Poster image
     val plot: String?,           // Description
     val genre: String?,          // "Crime, Drama"
-    val last_modified: String?,  // ⭐ Used as 'added' timestamp
+    val last_modified: String?,  // [NEW] Used as 'added' timestamp
     // ... other fields
 )
 ```
