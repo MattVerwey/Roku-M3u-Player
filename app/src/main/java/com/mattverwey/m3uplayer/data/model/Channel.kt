@@ -16,7 +16,10 @@ data class Channel(
     val rating: String? = null,
     val duration: Int? = null, // For VOD
     val releaseDate: String? = null,
-    val genre: String? = null
+    val genre: String? = null,
+    val seriesId: Int? = null, // For series
+    val seasonNumber: Int? = null, // For series episodes
+    val episodeNumber: Int? = null // For series episodes
 ) : Parcelable
 
 enum class ChannelCategory {

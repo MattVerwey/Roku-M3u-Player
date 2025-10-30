@@ -46,10 +46,12 @@ class PlaybackActivity : AppCompatActivity() {
     private var controlsVisible = false
     private val handler = Handler(Looper.getMainLooper())
     private var hideControlsRunnable: Runnable? = null
+    private var seriesPlaybackHelper: SeriesPlaybackHelper? = null
     
     companion object {
         const val EXTRA_CHANNEL = "extra_channel"
-        const val EXTRA_NEXT_EPISODE_URL = "extra_next_episode_url"
+        const val EXTRA_SERIES_INFO = "extra_series_info"
+        const val EXTRA_CREDENTIALS = "extra_credentials"
         private const val SEEK_INCREMENT_MS = 10000L // 10 seconds
         private const val CONTROLS_HIDE_DELAY_MS = 5000L // 5 seconds
     }
@@ -76,6 +78,27 @@ class PlaybackActivity : AppCompatActivity() {
         }
         
         epgService = EPGService()
+        
+        // Initialize series helper if this is a series episode
+        if (channel?.category == ChannelCategory.SERIES) {
+            val seriesInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra(EXTRA_SERIES_INFO, com.mattverwey.m3uplayer.data.model.XtreamSeriesInfo::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                intent.getParcelableExtra(EXTRA_SERIES_INFO)
+            }
+            
+            val credentials = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra(EXTRA_CREDENTIALS, com.mattverwey.m3uplayer.data.model.XtreamCredentials::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                intent.getParcelableExtra(EXTRA_CREDENTIALS)
+            }
+            
+            if (seriesInfo != null && credentials != null) {
+                seriesPlaybackHelper = SeriesPlaybackHelper(seriesInfo, credentials)
+            }
+        }
         
         setupPlayer()
         setupUI()
@@ -229,11 +252,20 @@ class PlaybackActivity : AppCompatActivity() {
         }
         
         // Setup play next button (only for series)
-        val nextEpisodeUrl = intent.getStringExtra(EXTRA_NEXT_EPISODE_URL)
-        if (channel?.category == ChannelCategory.SERIES && nextEpisodeUrl != null) {
-            btnPlayNext.visibility = View.VISIBLE
-            btnPlayNext.setOnClickListener {
-                playNextEpisode(nextEpisodeUrl)
+        if (channel?.category == ChannelCategory.SERIES && seriesPlaybackHelper != null) {
+            val hasNext = channel?.seasonNumber?.let { season ->
+                channel?.episodeNumber?.let { episode ->
+                    seriesPlaybackHelper?.hasNextEpisode(season, episode) ?: false
+                }
+            } ?: false
+            
+            if (hasNext) {
+                btnPlayNext.visibility = View.VISIBLE
+                btnPlayNext.setOnClickListener {
+                    playNextEpisode()
+                }
+            } else {
+                btnPlayNext.visibility = View.GONE
             }
         } else {
             btnPlayNext.visibility = View.GONE
@@ -363,20 +395,51 @@ class PlaybackActivity : AppCompatActivity() {
         return "$startTime - $endTime"
     }
     
-    private fun playNextEpisode(nextEpisodeUrl: String) {
-        player?.let { p ->
-            val mediaItem = MediaItem.fromUri(nextEpisodeUrl)
-            p.setMediaItem(mediaItem)
-            p.prepare()
-            p.playWhenReady = true
+    private fun playNextEpisode() {
+        if (seriesPlaybackHelper == null || channel?.seasonNumber == null || channel?.episodeNumber == null) {
+            finish()
+            return
+        }
+        
+        val nextEpisode = seriesPlaybackHelper?.getNextEpisode(
+            channel!!.seasonNumber!!,
+            channel!!.episodeNumber!!
+        )
+        
+        if (nextEpisode != null) {
+            val nextUrl = seriesPlaybackHelper?.getEpisodeStreamUrl(nextEpisode)
+            if (nextUrl != null) {
+                player?.let { p ->
+                    val mediaItem = MediaItem.fromUri(nextUrl)
+                    p.setMediaItem(mediaItem)
+                    p.prepare()
+                    p.playWhenReady = true
+                    
+                    // Update channel info
+                    channel = channel?.copy(
+                        name = seriesPlaybackHelper?.getEpisodeTitle(nextEpisode) ?: nextEpisode.title,
+                        streamUrl = nextUrl,
+                        seasonNumber = nextEpisode.season,
+                        episodeNumber = nextEpisode.episode_num
+                    )
+                    
+                    // Update UI
+                    binding.channelName.text = channel?.name
+                    binding.channelName.visibility = View.VISIBLE
+                    binding.channelName.postDelayed({
+                        binding.channelName.visibility = View.GONE
+                    }, 3000)
+                }
+            }
+        } else {
+            finish()
         }
     }
     
     private fun handlePlaybackEnded() {
-        val nextEpisodeUrl = intent.getStringExtra(EXTRA_NEXT_EPISODE_URL)
-        if (channel?.category == ChannelCategory.SERIES && nextEpisodeUrl != null) {
+        if (channel?.category == ChannelCategory.SERIES && seriesPlaybackHelper != null) {
             // Auto-play next episode
-            playNextEpisode(nextEpisodeUrl)
+            playNextEpisode()
         } else {
             finish()
         }
