@@ -27,11 +27,15 @@ A modern IPTV player for Amazon Fire TV Cube and Fire TV devices with support fo
 - Picture-in-Picture mode for multitasking
 - Playback controls optimized for Fire TV remote
 
-### Data Management
+### Data Management & Security
 - Persistent caching of playlists (24-hour expiry)
-- Secure credential storage
-- Recently watched tracking (up to 50 channels)
+- **AES-256 encrypted credential storage** (EncryptedSharedPreferences)
+- **Privacy controls** for viewing history tracking
+- Encrypted storage of all sensitive data (credentials, URLs, history)
+- **Secure logout** with memory cleanup
+- Recently watched tracking (up to 50 channels, user-controllable)
 - Offline access to cached data
+- No data sent to third parties
 
 ## Technology Stack
 
@@ -41,6 +45,7 @@ A modern IPTV player for Amazon Fire TV Cube and Fire TV devices with support fo
 - **Video Player**: ExoPlayer (Media3)
 - **Networking**: Retrofit + OkHttp
 - **Image Loading**: Coil
+- **Security**: AndroidX Security (EncryptedSharedPreferences)
 - **Architecture**: MVVM with Repository pattern
 
 ## Setup & Installation
@@ -105,6 +110,29 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 - Video continues playing in corner while you browse
 - Select another channel to switch streams
 - Press **Back** to exit PIP and return to full screen
+
+### Privacy & Security Settings
+
+Access settings via **Menu button** on main screen:
+
+- **Toggle Viewing History Tracking**: Enable/disable recently watched tracking
+- **Clear Viewing History**: Delete all viewing history
+- **Clear Cache**: Remove cached playlists and EPG data
+- **Logout**: Securely clear all credentials and data
+
+## Security Features
+
+🔒 **Comprehensive security measures protect your credentials and viewing privacy:**
+
+- **AES-256 Encryption**: All credentials encrypted using Android Keystore
+- **Secure Storage**: Xtream credentials, M3U URLs, and viewing history encrypted at rest
+- **Privacy Controls**: User-controllable viewing history tracking
+- **Secure Logout**: Complete data wipe on logout with memory cleanup
+- **No Data Sharing**: All data stays on your device, no third-party tracking
+- **Network Security**: Cleartext traffic disabled in release builds
+- **Code Protection**: ProGuard removes logging and obfuscates sensitive code
+
+For detailed security information, see [SECURITY.md](SECURITY.md)
 
 ## Project Structure
 
