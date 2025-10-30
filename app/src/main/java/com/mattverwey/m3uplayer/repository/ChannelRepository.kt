@@ -15,6 +15,7 @@ class ChannelRepository(private val cacheManager: CacheManager) {
     
     private val m3uParser = M3UParser()
     private var xtreamApiService: XtreamApiService? = null
+    private val recommendationEngine = com.mattverwey.m3uplayer.data.RecommendationEngine()
     
     // Load channels from cache or network
     suspend fun loadChannels(forceRefresh: Boolean = false): Result<List<Channel>> {
@@ -101,6 +102,18 @@ class ChannelRepository(private val cacheManager: CacheManager) {
             }
         }
         
+        // Get series
+        val seriesResponse = service.getSeries(
+            credentials.username,
+            credentials.password
+        )
+        
+        if (seriesResponse.isSuccessful) {
+            seriesResponse.body()?.forEach { series ->
+                channels.add(series.toChannel(credentials))
+            }
+        }
+        
         return channels
     }
     
@@ -155,6 +168,31 @@ class ChannelRepository(private val cacheManager: CacheManager) {
         cacheManager.addRecentlyWatched(channelId)
     }
     
+    // Latest added content
+    fun getLatestAddedContent(allChannels: List<Channel>, limit: Int = 30): List<Channel> {
+        return allChannels
+            .filter { 
+                // Only include movies and series with an "added" timestamp
+                (it.category == ChannelCategory.MOVIE || it.category == ChannelCategory.SERIES) 
+                && it.added != null 
+            }
+            .sortedByDescending { channel ->
+                // Parse timestamp - Xtream API typically returns Unix timestamp as string
+                channel.added?.toLongOrNull() ?: 0L
+            }
+            .take(limit)
+    }
+    
+    // Recommendations based on watch history
+    fun getRecommendations(allChannels: List<Channel>, maxRecommendations: Int = 30): List<Channel> {
+        val watchHistory = cacheManager.getRecentlyWatched()
+        return recommendationEngine.generateRecommendations(
+            watchHistory = watchHistory,
+            allChannels = allChannels,
+            maxRecommendations = maxRecommendations
+        )
+    }
+    
     // Clear cache
     fun clearCache() {
         cacheManager.clearCache()
@@ -172,7 +210,8 @@ private fun XtreamStream.toChannel(credentials: XtreamCredentials): Channel {
         groupTitle = category_id,
         epgChannelId = epg_channel_id,
         category = ChannelCategory.LIVE_TV,
-        rating = rating
+        rating = rating,
+        added = added
     )
 }
 
@@ -184,6 +223,26 @@ private fun XtreamVOD.toChannel(credentials: XtreamCredentials): Channel {
         streamUrl = streamUrl,
         logoUrl = stream_icon,
         category = ChannelCategory.MOVIE,
-        rating = rating
+        rating = rating,
+        added = added
+    )
+}
+
+private fun XtreamSeries.toChannel(credentials: XtreamCredentials): Channel {
+    // Series don't have a direct stream URL - they need to be accessed via episodes
+    // We'll create a placeholder URL that can be parsed later to load episodes
+    val streamUrl = "${credentials.serverUrl}/series/${credentials.username}/${credentials.password}/$series_id.m3u8"
+    return Channel(
+        id = "series_$series_id",
+        name = name,
+        streamUrl = streamUrl,
+        logoUrl = cover,
+        category = ChannelCategory.SERIES,
+        description = plot,
+        rating = rating,
+        genre = genre,
+        releaseDate = releaseDate,
+        added = last_modified, // Series use last_modified as their "added" timestamp
+        seriesId = series_id
     )
 }
