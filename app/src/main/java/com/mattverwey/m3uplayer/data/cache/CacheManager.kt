@@ -23,12 +23,12 @@ class CacheManager(context: Context) {
     private val gson = Gson()
     
     private fun createEncryptedPreferences(context: Context): SharedPreferences {
-        return try {
+        try {
             val masterKey = MasterKey.Builder(context)
                 .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                 .build()
             
-            EncryptedSharedPreferences.create(
+            return EncryptedSharedPreferences.create(
                 context,
                 "m3u_player_secure",
                 masterKey,
@@ -36,9 +36,12 @@ class CacheManager(context: Context) {
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             )
         } catch (e: Exception) {
-            // Fallback to regular SharedPreferences if encryption fails
-            // This should be logged but not crash the app
-            context.getSharedPreferences("m3u_player_secure_fallback", Context.MODE_PRIVATE)
+            // Encryption is critical for security - do not allow app to run without it
+            throw SecurityException(
+                "Failed to initialize encrypted storage. The app cannot run without encryption support. " +
+                "This device may not support Android Keystore or secure storage. Error: ${e.message}",
+                e
+            )
         }
     }
     

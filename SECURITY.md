@@ -30,6 +30,8 @@ cacheManager.setXtreamCredentials(credentials)
 cacheManager.setM3UUrl(url)
 ```
 
+**Important**: If the device does not support encrypted storage (Android Keystore unavailable), the app will throw a `SecurityException` and display an error message to the user. The app will not run without encryption support, ensuring that credentials are never stored in plain text.
+
 ### 2. Viewing Privacy Controls
 
 Users have complete control over their viewing history:

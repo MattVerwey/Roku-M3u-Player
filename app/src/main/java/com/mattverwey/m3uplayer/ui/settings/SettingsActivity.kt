@@ -27,10 +27,15 @@ class SettingsActivity : AppCompatActivity() {
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
-        cacheManager = CacheManager(this)
-        
-        setupUI()
-        setupListeners()
+        try {
+            cacheManager = CacheManager(this)
+            
+            setupUI()
+            setupListeners()
+        } catch (e: SecurityException) {
+            // Show error dialog and exit if encryption is not available
+            showEncryptionUnavailableDialog(e.message ?: "Encryption not available")
+        }
     }
     
     private fun setupUI() {
@@ -122,5 +127,16 @@ class SettingsActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
+    }
+    
+    private fun showEncryptionUnavailableDialog(message: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Security Feature Unavailable")
+            .setMessage("This app requires secure storage to protect your credentials, but your device does not support it.\n\n$message")
+            .setCancelable(false)
+            .setPositiveButton("Exit") { _, _ ->
+                finish()
+            }
+            .show()
     }
 }

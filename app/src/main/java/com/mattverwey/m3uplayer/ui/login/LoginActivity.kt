@@ -1,5 +1,6 @@
 package com.mattverwey.m3uplayer.ui.login
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -32,11 +33,16 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
-        cacheManager = CacheManager(this)
-        repository = ChannelRepository(cacheManager)
-        
-        setupUI()
-        setupListeners()
+        try {
+            cacheManager = CacheManager(this)
+            repository = ChannelRepository(cacheManager)
+            
+            setupUI()
+            setupListeners()
+        } catch (e: SecurityException) {
+            // Show error dialog and exit if encryption is not available
+            showEncryptionUnavailableDialog(e.message ?: "Encryption not available")
+        }
     }
     
     private fun setupUI() {
@@ -163,6 +169,17 @@ class LoginActivity : AppCompatActivity() {
     private fun showLoading(show: Boolean) {
         binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
         binding.loginButton.isEnabled = !show
+    }
+    
+    private fun showEncryptionUnavailableDialog(message: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Security Feature Unavailable")
+            .setMessage("This app requires secure storage to protect your credentials, but your device does not support it.\n\n$message")
+            .setCancelable(false)
+            .setPositiveButton("Exit") { _, _ ->
+                finish()
+            }
+            .show()
     }
     
     private fun navigateToMain() {
