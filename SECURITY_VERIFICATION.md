@@ -4,9 +4,12 @@
 
 This document provides a comprehensive verification of the security measures implemented in the M3U Player application, specifically addressing the requirement: **"Confirm app is secure and no one should be able to see the stream data from the app as this is encrypted"**
 
-**Verification Date**: October 30, 2024  
+**Last Verification**: October 30, 2024  
 **App Version**: 2.0.0  
+**Next Verification Due**: October 30, 2025 (or when major security-related changes are made)  
 **Security Assessment**: ✅ **VERIFIED SECURE**
+
+> **Note**: This verification document should be updated whenever significant security-related changes are made to the application, or at minimum annually as part of regular security audits.
 
 ---
 
@@ -525,8 +528,24 @@ For security-related questions:
 ---
 
 **Document Version**: 1.0  
+**Document Created**: October 30, 2024  
 **Last Updated**: October 30, 2024  
-**Next Review**: October 30, 2025  
+**Next Review Due**: October 30, 2025 (or upon significant security changes)  
 **Verified By**: Security Assessment Team  
 
 **Signature**: ✅ **SECURITY VERIFIED** - All sensitive stream data is protected with enterprise-grade encryption.
+
+---
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | October 30, 2024 | Initial security verification document created |
+
+> **Maintenance Note**: Update this document when:
+> - Security-related code changes are made
+> - New security features are added
+> - Security vulnerabilities are discovered and fixed
+> - Annual security audit is performed
+> - Encryption methods are changed or updated

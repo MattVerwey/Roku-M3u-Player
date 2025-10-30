@@ -18,10 +18,13 @@
     </debug-overrides>
     
     <!-- Optional: Domain-specific configurations can be added here -->
-    <!-- Example for allowing specific domains if needed in the future:
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">localhost</domain>
-        <domain includeSubdomains="true">192.168.1.1</domain>
-    </domain-config>
+    <!-- WARNING: Only add cleartext exceptions for DEBUG builds and local testing.
+         NEVER allow cleartext for production domains as this exposes credentials!
+         
+         Example for DEBUG builds only (NOT for production):
+         <domain-config cleartextTrafficPermitted="true">
+             <domain includeSubdomains="true">localhost</domain>
+             <domain includeSubdomains="true">192.168.1.1</domain>
+         </domain-config>
     -->
 </network-security-config>
