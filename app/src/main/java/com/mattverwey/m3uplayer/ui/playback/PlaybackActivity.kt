@@ -234,7 +234,12 @@ class PlaybackActivity : AppCompatActivity() {
         // Setup fast forward button
         btnFastForward.setOnClickListener {
             player?.let { p ->
-                val newPosition = (p.currentPosition + SEEK_INCREMENT_MS).coerceAtMost(p.duration)
+                val duration = p.duration
+                val newPosition = if (duration != C.TIME_UNSET) {
+                    (p.currentPosition + SEEK_INCREMENT_MS).coerceAtMost(duration)
+                } else {
+                    p.currentPosition + SEEK_INCREMENT_MS
+                }
                 p.seekTo(newPosition)
             }
             resetHideControlsTimer()
