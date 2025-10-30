@@ -42,24 +42,48 @@ class EPGParser {
                                 currentCategory = null
                             }
                             "title" -> {
-                                parser.next()
-                                if (parser.eventType == XmlPullParser.TEXT) {
-                                    currentTitle = parser.text
+                                var foundText = false
+                                while (!foundText) {
+                                    val nextEvent = parser.next()
+                                    if (nextEvent == XmlPullParser.TEXT) {
+                                        currentTitle = parser.text
+                                        foundText = true
+                                    } else if (nextEvent == XmlPullParser.END_TAG && parser.name == "title") {
+                                        foundText = true
+                                    } else if (nextEvent == XmlPullParser.END_DOCUMENT) {
+                                        foundText = true
+                                    }
                                 }
                             }
                             "desc" -> {
-                                parser.next()
-                                if (parser.eventType == XmlPullParser.TEXT) {
-                                    currentDescription = parser.text
+                                var foundText = false
+                                while (!foundText) {
+                                    val nextEvent = parser.next()
+                                    if (nextEvent == XmlPullParser.TEXT) {
+                                        currentDescription = parser.text
+                                        foundText = true
+                                    } else if (nextEvent == XmlPullParser.END_TAG && parser.name == "desc") {
+                                        foundText = true
+                                    } else if (nextEvent == XmlPullParser.END_DOCUMENT) {
+                                        foundText = true
+                                    }
                                 }
                             }
                             "icon" -> {
                                 currentIcon = parser.getAttributeValue(null, "src")
                             }
                             "category" -> {
-                                parser.next()
-                                if (parser.eventType == XmlPullParser.TEXT) {
-                                    currentCategory = parser.text
+                                var foundText = false
+                                while (!foundText) {
+                                    val nextEvent = parser.next()
+                                    if (nextEvent == XmlPullParser.TEXT) {
+                                        currentCategory = parser.text
+                                        foundText = true
+                                    } else if (nextEvent == XmlPullParser.END_TAG && parser.name == "category") {
+                                        foundText = true
+                                    } else if (nextEvent == XmlPullParser.END_DOCUMENT) {
+                                        foundText = true
+                                    }
                                 }
                             }
                         }
