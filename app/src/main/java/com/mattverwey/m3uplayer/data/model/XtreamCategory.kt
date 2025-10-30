@@ -10,10 +10,10 @@ data class XtreamCategory(
 )
 
 data class XtreamStream(
-    val num: Int? = null,
     val name: String,
-    val stream_type: String? = null,
     val stream_id: Int,
+    val num: Int? = null,
+    val stream_type: String? = null,
     val stream_icon: String? = null,
     val epg_channel_id: String? = null,
     val added: String? = null,
@@ -27,10 +27,10 @@ data class XtreamStream(
 )
 
 data class XtreamVOD(
-    val num: Int? = null,
     val name: String,
-    val stream_type: String? = null,
     val stream_id: Int,
+    val num: Int? = null,
+    val stream_type: String? = null,
     val stream_icon: String? = null,
     val rating: String? = null,
     val rating_5based: Double? = null,
@@ -84,9 +84,9 @@ data class MovieData(
 )
 
 data class XtreamSeries(
-    val num: Int? = null,
     val name: String,
     val series_id: Int,
+    val num: Int? = null,
     val cover: String? = null,
     val plot: String? = null,
     val cast: String? = null,
