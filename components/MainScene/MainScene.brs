@@ -18,6 +18,15 @@ sub init()
 End sub
 
 ' **************************************************************
+' Helper function to set video to list view (small size, right position)
+' **************************************************************
+sub setVideoToListView()
+    m.video.translation = [800, 100]
+    m.video.width = 960
+    m.video.height = 540
+end sub
+
+' **************************************************************
 
 function onKeyEvent(key as String, press as Boolean) as Boolean
     result = false
@@ -32,15 +41,11 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
             result = true
         else if(key = "left")
             m.list.SetFocus(true)
-            m.video.translation = [800, 100]
-            m.video.width = 960
-            m.video.height = 540
+            setVideoToListView()
             result = true
         else if(key = "back")
             m.list.SetFocus(true)
-            m.video.translation = [800, 100]
-            m.video.width = 960
-            m.video.height = 540
+            setVideoToListView()
             result = true
         else if(key = "options")
             showdialog()

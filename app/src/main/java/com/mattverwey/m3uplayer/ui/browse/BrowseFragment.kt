@@ -84,6 +84,12 @@ class BrowseFragment : BrowseSupportFragment() {
             addRow(getString(R.string.recently_watched), recentChannels)
         }
         
+        // Latest Added (Movies & Series)
+        val latestAdded = repository.getLatestAddedContent(channels, limit = 30)
+        if (latestAdded.isNotEmpty()) {
+            addRow(getString(R.string.latest_added), latestAdded)
+        }
+        
         // Live TV
         val liveChannels = channels.filter { it.category == ChannelCategory.LIVE_TV }
         if (liveChannels.isNotEmpty()) {
@@ -110,6 +116,12 @@ class BrowseFragment : BrowseSupportFragment() {
                     addRow(categoryName, categoryChannels)
                 }
             }
+        }
+        
+        // Recommended for You (at the bottom)
+        val recommendations = repository.getRecommendations(channels, maxRecommendations = 30)
+        if (recommendations.isNotEmpty()) {
+            addRow(getString(R.string.recommended), recommendations)
         }
         
         adapter = rowsAdapter
