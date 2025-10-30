@@ -35,7 +35,8 @@ class BrowseFragment : BrowseSupportFragment() {
     }
     
     private fun setupUI() {
-        title = "M3U Player"
+        title = "Home"
+        badgeDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_placeholder)
         
         // Enable headers (left sidebar) - START WITH IT VISIBLE
         headersState = HEADERS_ENABLED
@@ -53,7 +54,7 @@ class BrowseFragment : BrowseSupportFragment() {
     
     private fun setupEventListeners() {
         // Handle item clicks
-        onItemViewClickedListener = OnItemViewClickedListener { _, item, _, _ ->
+        onItemViewClickedListener = OnItemViewClickedListener { _, item, _, row ->
             if (item is Channel) {
                 // For live TV, play directly. For VOD, show details first
                 if (item.category == ChannelCategory.LIVE_TV) {
@@ -64,12 +65,15 @@ class BrowseFragment : BrowseSupportFragment() {
             }
         }
         
-        // Handle header (sidebar menu) selection
+        // Handle header (sidebar menu) selection - open Settings when Settings row is selected
         setOnItemViewSelectedListener { _, item, _, row ->
             if (row is ListRow) {
                 val headerTitle = row.headerItem?.name ?: ""
-                // Just highlight the selected menu item
-                // Actual navigation happens when user presses RIGHT
+                // Check if Settings row is selected and no content items exist
+                if (headerTitle.contains("Settings") && item == null) {
+                    // Show options menu when Settings row is focused
+                    showOptionsMenu()
+                }
             }
         }
     }
@@ -107,28 +111,44 @@ class BrowseFragment : BrowseSupportFragment() {
         val movies = channels.filter { it.category == ChannelCategory.MOVIE }
         val series = channels.filter { it.category == ChannelCategory.SERIES }
         
-        // Create MAIN MENU with only 4 options
-        // Each main menu item will show a placeholder row
+        // HOME PAGE SECTIONS - Create a proper landing page
         
-        // 1. Live TV
+        // 1. Recently Watched - Show at the top for easy access
+        val recentlyWatched = repository.getRecentlyWatchedChannels(channels)
+        if (recentlyWatched.isNotEmpty()) {
+            addRow("⏱️ Recently Watched", recentlyWatched.take(20))
+        }
+        
+        // 2. Recommendations - Based on watch history
+        val recommendations = repository.getRecommendations(channels, maxRecommendations = 20)
+        if (recommendations.isNotEmpty()) {
+            addRow("💡 Recommended For You", recommendations)
+        }
+        
+        // 3. Latest Added - Recently added content
+        val latestAdded = repository.getLatestAddedContent(channels, limit = 20)
+        if (latestAdded.isNotEmpty()) {
+            addRow("🆕 Latest Added", latestAdded)
+        }
+        
+        // CATEGORY SECTIONS - Full browsable categories
+        
+        // 4. Live TV - All live channels
         if (liveChannels.isNotEmpty()) {
-            val sampleLive = liveChannels.take(10)
-            addRow("📺 Live TV", sampleLive)
+            addRow("📺 Live TV", liveChannels.take(30))
         }
         
-        // 2. Movies
+        // 5. Movies - All movies
         if (movies.isNotEmpty()) {
-            val sampleMovies = movies.take(10)
-            addRow("🎬 Movies", sampleMovies)
+            addRow("🎬 Movies", movies.take(30))
         }
         
-        // 3. Series
+        // 6. Series - All series
         if (series.isNotEmpty()) {
-            val sampleSeries = series.take(10)
-            addRow("📺 Series", sampleSeries)
+            addRow("📺 Series", series.take(30))
         }
         
-        // 4. Settings (empty row for now)
+        // 7. Settings - Empty row for settings menu
         val emptyRow = ArrayObjectAdapter(ChannelCardPresenter())
         val settingsHeader = HeaderItem(rowsAdapter.size().toLong(), "⚙️ Settings")
         rowsAdapter.add(ListRow(settingsHeader, emptyRow))
@@ -181,6 +201,11 @@ class BrowseFragment : BrowseSupportFragment() {
         // Always start with sidebar visible
         if (!isShowingHeaders) {
             startHeadersTransition(true)
+        }
+        
+        // Refresh rows to update Recently Watched when returning from playback
+        if (allChannels.isNotEmpty()) {
+            setupRows(allChannels)
         }
     }
     
