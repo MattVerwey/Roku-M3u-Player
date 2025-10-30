@@ -70,9 +70,3 @@ lint/tmp/
 # OS files
 .DS_Store
 Thumbs.db
-
-# Old BrightScript files (legacy)
-components/
-images/
-source/
-manifest
