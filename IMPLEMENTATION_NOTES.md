@@ -158,7 +158,7 @@ private fun setupRows(channels: List<Channel>) {
 
 ### Requirement 3: "Suggested watches based on machine learning from what I have been watching"
 ✅ **DONE**
-- `RecommendationEngine` implements ML-based suggestions
+- `RecommendationEngine` implements intelligent, adaptive suggestions
 - Analyzes watch history patterns (genre, category, recency)
 - Scores content based on multiple weighted factors
 - Returns personalized recommendations
@@ -293,6 +293,6 @@ For issues or questions:
 This implementation fully addresses all requirements from the issue:
 1. ✅ Series categories properly implemented
 2. ✅ Latest 30 added tracked with `added` variable
-3. ✅ ML-based recommendations from watch history
+3. ✅ Intelligent, adaptive recommendations from watch history
 
 The code is production-ready, well-documented, and optimized for performance.

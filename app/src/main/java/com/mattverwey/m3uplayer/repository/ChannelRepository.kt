@@ -1,5 +1,6 @@
 package com.mattverwey.m3uplayer.repository
 
+import android.util.Log
 import com.mattverwey.m3uplayer.data.cache.CacheManager
 import com.mattverwey.m3uplayer.data.model.*
 import com.mattverwey.m3uplayer.network.M3UParser
@@ -16,6 +17,10 @@ class ChannelRepository(private val cacheManager: CacheManager) {
     private val m3uParser = M3UParser()
     private var xtreamApiService: XtreamApiService? = null
     private val recommendationEngine = com.mattverwey.m3uplayer.data.RecommendationEngine()
+    
+    companion object {
+        private const val TAG = "ChannelRepository"
+    }
     
     // Load channels from cache or network
     suspend fun loadChannels(forceRefresh: Boolean = false): Result<List<Channel>> {
@@ -112,6 +117,8 @@ class ChannelRepository(private val cacheManager: CacheManager) {
             seriesResponse.body()?.forEach { series ->
                 channels.add(series.toChannel(credentials))
             }
+        } else {
+            Log.w(TAG, "Failed to fetch series: ${seriesResponse.code()} - ${seriesResponse.message()}")
         }
         
         return channels

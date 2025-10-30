@@ -187,7 +187,7 @@ Check the documentation files for more details:
 Your M3U Player now has three powerful new features:
 1. ✅ Full series support
 2. ✅ Latest 30 added tracking
-3. ✅ Smart ML-based recommendations
+3. ✅ Smart, adaptive recommendations
 
 All working together to help you discover and enjoy your content!
 
