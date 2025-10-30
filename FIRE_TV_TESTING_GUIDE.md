@@ -4,6 +4,7 @@ Complete guide for testing the M3U Player on Amazon Fire TV Cube and other Fire 
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
+- [Building the APK](#building-the-apk)
 - [Installation Methods](#installation-methods)
 - [Testing Checklist](#testing-checklist)
 - [UI Testing](#ui-testing)
@@ -21,12 +22,262 @@ Complete guide for testing the M3U Player on Amazon Fire TV Cube and other Fire 
 ### Required Software
 - Android Studio (latest version) OR
 - Android SDK Platform Tools (for ADB only)
+- JDK 17 or higher (for building APK)
 - M3U Player APK file
 
 ### Network Requirements
 - WiFi network (2.4GHz or 5GHz)
 - Stable internet connection for streaming
 - Router with sufficient bandwidth (minimum 10 Mbps recommended)
+
+## Building the APK
+
+This section explains how to build the M3U Player APK file from source code using the Android SDK command-line tools.
+
+### Prerequisites for Building
+
+Before building, ensure you have:
+
+1. **Java Development Kit (JDK) 17 or higher**
+   ```bash
+   # Check Java version
+   java -version
+   
+   # Should show version 17 or higher
+   # Example output: openjdk version "17.0.9" 2023-10-17
+   ```
+
+   If you don't have JDK 17, download it from:
+   - [Oracle JDK](https://www.oracle.com/java/technologies/downloads/)
+   - [OpenJDK](https://adoptium.net/)
+
+2. **Android SDK Command Line Tools**
+   
+   Download from: https://developer.android.com/studio#command-line-tools-only
+   
+   Extract and set up the SDK:
+   ```bash
+   # Extract command line tools
+   mkdir -p ~/android-sdk/cmdline-tools
+   unzip commandlinetools-*.zip -d ~/android-sdk/cmdline-tools
+   mv ~/android-sdk/cmdline-tools/cmdline-tools ~/android-sdk/cmdline-tools/latest
+   
+   # Set environment variables (add to ~/.bashrc or ~/.zshrc)
+   export ANDROID_HOME=~/android-sdk
+   export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
+   export PATH=$PATH:$ANDROID_HOME/platform-tools
+   ```
+
+3. **Install Required Android SDK Packages**
+   ```bash
+   # Accept licenses
+   sdkmanager --licenses
+   
+   # Install required SDK components
+   sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+   ```
+
+### Setting Up the Project
+
+1. **Clone the repository** (if not already done):
+   ```bash
+   git clone https://github.com/MattVerwey/Roku-M3u-Player.git
+   cd Roku-M3u-Player
+   ```
+
+2. **Generate Gradle Wrapper** (if not present):
+   
+   The project uses Gradle Wrapper, which may need to be generated:
+   
+   **Option 1: Using system Gradle (Recommended)**
+   ```bash
+   # Install Gradle if not already installed
+   # On macOS with Homebrew:
+   brew install gradle
+   
+   # On Linux (Debian/Ubuntu):
+   sudo apt-get install gradle
+   
+   # On Windows with Chocolatey:
+   choco install gradle
+   
+   # Generate wrapper using system Gradle (version 8.2 or compatible)
+   gradle wrapper --gradle-version 8.2
+   
+   # This creates:
+   # - gradlew (Linux/Mac script)
+   # - gradlew.bat (Windows script)
+   # - gradle/wrapper/gradle-wrapper.jar
+   ```
+   
+   **Option 2: Using Gradle without installing**
+   
+   If you cannot install Gradle system-wide, download and use it temporarily:
+   ```bash
+   # Download Gradle distribution
+   curl -L https://services.gradle.org/distributions/gradle-8.2-bin.zip -o gradle.zip
+   unzip gradle.zip
+   
+   # Use downloaded Gradle to generate wrapper
+   ./gradle-8.2/bin/gradle wrapper --gradle-version 8.2
+   
+   # Clean up temporary Gradle
+   rm -rf gradle-8.2 gradle.zip
+   ```
+
+### Building the APK
+
+Once prerequisites are set up, build the APK:
+
+#### Build Debug APK (for testing)
+
+```bash
+# Make gradlew executable (Linux/Mac)
+chmod +x gradlew
+
+# Build debug APK
+./gradlew assembleDebug
+
+# On Windows:
+# gradlew.bat assembleDebug
+```
+
+**Output location:**
+```
+app/build/outputs/apk/debug/app-debug.apk
+```
+
+**Build time:** First build may take 2-5 minutes (downloads dependencies). Subsequent builds are faster (30-60 seconds).
+
+#### Build Release APK (for distribution)
+
+For a release build with optimizations:
+
+```bash
+# Build release APK (unsigned)
+./gradlew assembleRelease
+
+# On Windows:
+# gradlew.bat assembleRelease
+```
+
+**Output location:**
+```
+app/build/outputs/apk/release/app-release-unsigned.apk
+```
+
+**Note:** Release APKs need to be signed before installation. For testing purposes, debug APKs are recommended.
+
+#### Signing a Release APK (Optional)
+
+If you need a signed release APK:
+
+1. **Create a keystore** (first time only):
+   ```bash
+   keytool -genkey -v -keystore my-release-key.keystore \
+     -alias my-key-alias -keyalg RSA -keysize 2048 -validity 10000
+   ```
+
+2. **Sign the APK**:
+   ```bash
+   # Build the release APK first
+   ./gradlew assembleRelease
+   
+   # Sign using jarsigner
+   jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
+     -keystore my-release-key.keystore \
+     app/build/outputs/apk/release/app-release-unsigned.apk \
+     my-key-alias
+   
+   # Verify signature
+   jarsigner -verify -verbose -certs \
+     app/build/outputs/apk/release/app-release-unsigned.apk
+   ```
+
+   Or use `apksigner` (recommended):
+   ```bash
+   # Sign the APK
+   apksigner sign --ks my-release-key.keystore \
+     --out app/build/outputs/apk/release/app-release-signed.apk \
+     app/build/outputs/apk/release/app-release-unsigned.apk
+   
+   # Verify signature
+   apksigner verify app/build/outputs/apk/release/app-release-signed.apk
+   ```
+
+### Cleaning the Build
+
+To clean build artifacts and start fresh:
+
+```bash
+# Clean build
+./gradlew clean
+
+# Clean and rebuild
+./gradlew clean assembleDebug
+```
+
+### Troubleshooting Build Issues
+
+#### "SDK location not found"
+```bash
+# Solution 1: Create local.properties file
+echo "sdk.dir=$ANDROID_HOME" > local.properties
+
+# Solution 2: Set ANDROID_HOME/ANDROID_SDK_ROOT environment variable
+export ANDROID_HOME=~/android-sdk
+export ANDROID_SDK_ROOT=~/android-sdk
+```
+
+#### "Could not find or load main class org.gradle.wrapper.GradleWrapperMain"
+```bash
+# Solution: Regenerate the Gradle wrapper
+# Install Gradle if needed, then run:
+gradle wrapper --gradle-version 8.2
+
+# Or download Gradle wrapper JAR from official distribution
+# Note: This uses Gradle 8.2 distribution; adjust version if needed
+rm -f gradle/wrapper/gradle-wrapper.jar
+curl -L https://services.gradle.org/distributions/gradle-8.2-bin.zip -o temp-gradle.zip
+unzip -j temp-gradle.zip "gradle-8.2/lib/gradle-wrapper.jar" -d gradle/wrapper/
+rm temp-gradle.zip
+```
+
+#### "Unsupported Java version"
+```bash
+# Solution: Check Java version (needs 17+)
+java -version
+
+# If version is wrong, set JAVA_HOME
+export JAVA_HOME=/path/to/jdk-17
+export PATH=$JAVA_HOME/bin:$PATH
+```
+
+#### Build fails with "Could not resolve dependencies"
+```bash
+# Solution: Clear Gradle cache and retry
+rm -rf ~/.gradle/caches
+./gradlew assembleDebug --refresh-dependencies
+```
+
+### Quick Build Reference
+
+For quick reference, here's the typical build workflow:
+
+```bash
+# 1. Clone repo
+git clone https://github.com/MattVerwey/Roku-M3u-Player.git
+cd Roku-M3u-Player
+
+# 2. Ensure gradlew exists and is executable
+chmod +x gradlew
+
+# 3. Build APK
+./gradlew assembleDebug
+
+# 4. Output APK location
+ls -lh app/build/outputs/apk/debug/app-debug.apk
+```
 
 ## Installation Methods
 
@@ -66,14 +317,13 @@ List of devices attached
 
 #### Step 3: Install the APK
 
+**Note:** If you don't have the APK file yet, see the [Building the APK](#building-the-apk) section above to build it from source.
+
 ```bash
-# Navigate to the APK location
+# Navigate to the repository directory
 cd /path/to/Roku-M3u-Player
 
-# Build the debug APK (if not already built)
-./gradlew assembleDebug
-
-# Install the APK
+# Install the APK (assumes you've already built it)
 adb install app/build/outputs/apk/debug/app-debug.apk
 
 # Or to reinstall (if already installed)
