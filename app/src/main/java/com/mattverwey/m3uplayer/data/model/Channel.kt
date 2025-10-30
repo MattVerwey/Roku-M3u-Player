@@ -17,6 +17,7 @@ data class Channel(
     val duration: Int? = null, // For VOD
     val releaseDate: String? = null,
     val genre: String? = null,
+    val added: String? = null, // Timestamp when added (for VOD/Series)
     val seriesId: Int? = null, // For series
     val seasonNumber: Int? = null, // For series episodes
     val episodeNumber: Int? = null // For series episodes
