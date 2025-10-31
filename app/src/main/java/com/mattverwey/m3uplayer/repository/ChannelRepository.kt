@@ -80,7 +80,7 @@ class ChannelRepository(private val cacheManager: CacheManager) {
             xtreamApiService = retrofit.create(XtreamApiService::class.java)
         }
         
-        val service = xtreamApiService!!
+        val service = xtreamApiService ?: throw Exception("Failed to initialize Xtream API service")
         val channels = mutableListOf<Channel>()
         
         // Fetch category metadata to map IDs to names
@@ -183,9 +183,8 @@ class ChannelRepository(private val cacheManager: CacheManager) {
                 val service = retrofit.create(XtreamApiService::class.java)
                 val response = service.authenticate(credentials.username, credentials.password)
                 
-                if (response.isSuccessful && response.body() != null) {
-                    val authResponse = response.body()!!
-                    
+                val authResponse = response.body()
+                if (response.isSuccessful && authResponse != null) {
                     // Check if authentication was successful
                     if (authResponse.user_info?.auth == 1) {
                         cacheManager.setXtreamCredentials(credentials)
