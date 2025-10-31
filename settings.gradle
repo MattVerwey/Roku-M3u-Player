@@ -1,21 +1,15 @@
 pluginManagement {
     repositories {
-        google()
-        mavenCentral()
         gradlePluginPortal()
-    }
-    plugins {
-        id("com.android.application") version "8.1.4"
-        id("org.jetbrains.kotlin.android") version "1.9.23"
-        id("org.jetbrains.kotlin.kapt") version "1.9.23"
-        id("org.jetbrains.kotlin.plugin.parcelize") version "1.9.23"
+        mavenCentral()
+        mavenLocal()
     }
 }
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
-        google()
         mavenCentral()
+        mavenLocal()
     }
 }
 rootProject.name = "M3U Player"

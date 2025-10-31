@@ -1,4 +1,14 @@
-// Top-level build file (kept minimal). Repositories and plugin versions are managed in settings.gradle.
+// Top-level build file
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10'
+    }
+}
 
 tasks.register('clean', Delete) {
     delete rootProject.buildDir

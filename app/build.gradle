@@ -47,7 +47,7 @@ android {
 
 dependencies {
     // Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.23"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.10"
     
     // Android TV Leanback
     implementation 'androidx.leanback:leanback:1.0.0'
