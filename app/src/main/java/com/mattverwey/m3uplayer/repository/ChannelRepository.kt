@@ -83,6 +83,53 @@ class ChannelRepository(private val cacheManager: CacheManager) {
         val service = xtreamApiService!!
         val channels = mutableListOf<Channel>()
         
+        // Fetch category metadata to map IDs to names
+        val liveCategoryMap = mutableMapOf<String, String>()
+        val vodCategoryMap = mutableMapOf<String, String>()
+        val seriesCategoryMap = mutableMapOf<String, String>()
+        
+        try {
+            val liveCategoriesResponse = service.getLiveCategories(
+                credentials.username,
+                credentials.password
+            )
+            if (liveCategoriesResponse.isSuccessful) {
+                liveCategoriesResponse.body()?.forEach { category ->
+                    liveCategoryMap[category.category_id] = category.category_name
+                }
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to fetch live categories: ${e.message}")
+        }
+        
+        try {
+            val vodCategoriesResponse = service.getVODCategories(
+                credentials.username,
+                credentials.password
+            )
+            if (vodCategoriesResponse.isSuccessful) {
+                vodCategoriesResponse.body()?.forEach { category ->
+                    vodCategoryMap[category.category_id] = category.category_name
+                }
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to fetch VOD categories: ${e.message}")
+        }
+        
+        try {
+            val seriesCategoriesResponse = service.getSeriesCategories(
+                credentials.username,
+                credentials.password
+            )
+            if (seriesCategoriesResponse.isSuccessful) {
+                seriesCategoriesResponse.body()?.forEach { category ->
+                    seriesCategoryMap[category.category_id] = category.category_name
+                }
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to fetch series categories: ${e.message}")
+        }
+        
         // Get live streams
         val liveResponse = service.getLiveStreams(
             credentials.username,
@@ -91,7 +138,7 @@ class ChannelRepository(private val cacheManager: CacheManager) {
         
         if (liveResponse.isSuccessful) {
             liveResponse.body()?.forEach { stream ->
-                channels.add(stream.toChannel(credentials))
+                channels.add(stream.toChannel(credentials, liveCategoryMap))
             }
         }
         
@@ -103,7 +150,7 @@ class ChannelRepository(private val cacheManager: CacheManager) {
         
         if (vodResponse.isSuccessful) {
             vodResponse.body()?.forEach { vod ->
-                channels.add(vod.toChannel(credentials))
+                channels.add(vod.toChannel(credentials, vodCategoryMap))
             }
         }
         
@@ -115,7 +162,7 @@ class ChannelRepository(private val cacheManager: CacheManager) {
         
         if (seriesResponse.isSuccessful) {
             seriesResponse.body()?.forEach { series ->
-                channels.add(series.toChannel(credentials))
+                channels.add(series.toChannel(credentials, seriesCategoryMap))
             }
         } else {
             Log.w(TAG, "Failed to fetch series: ${seriesResponse.code()} - ${seriesResponse.message()}")
@@ -227,14 +274,16 @@ class ChannelRepository(private val cacheManager: CacheManager) {
 }
 
 // Extension functions to convert Xtream models to Channel
-private fun XtreamStream.toChannel(credentials: XtreamCredentials): Channel {
+private fun XtreamStream.toChannel(credentials: XtreamCredentials, categoryMap: Map<String, String>): Channel {
     val streamUrl = "${credentials.serverUrl}/live/${credentials.username}/${credentials.password}/$stream_id.m3u8"
+    // Use category name from map if available, otherwise use category_id
+    val categoryName = category_id?.let { categoryMap[it] } ?: category_id
     return Channel(
         id = "live_$stream_id",
         name = name,
         streamUrl = streamUrl,
         logoUrl = stream_icon,
-        groupTitle = category_id,
+        groupTitle = categoryName,
         epgChannelId = epg_channel_id,
         category = ChannelCategory.LIVE_TV,
         rating = rating,
@@ -242,28 +291,34 @@ private fun XtreamStream.toChannel(credentials: XtreamCredentials): Channel {
     )
 }
 
-private fun XtreamVOD.toChannel(credentials: XtreamCredentials): Channel {
+private fun XtreamVOD.toChannel(credentials: XtreamCredentials, categoryMap: Map<String, String>): Channel {
     val streamUrl = "${credentials.serverUrl}/movie/${credentials.username}/${credentials.password}/$stream_id.$container_extension"
+    // Use category name from map if available, otherwise use category_id
+    val categoryName = category_id?.let { categoryMap[it] } ?: category_id
     return Channel(
         id = "vod_$stream_id",
         name = name,
         streamUrl = streamUrl,
         logoUrl = stream_icon,
+        groupTitle = categoryName,
         category = ChannelCategory.MOVIE,
         rating = rating,
         added = added
     )
 }
 
-private fun XtreamSeries.toChannel(credentials: XtreamCredentials): Channel {
+private fun XtreamSeries.toChannel(credentials: XtreamCredentials, categoryMap: Map<String, String>): Channel {
     // Series don't have a direct stream URL - they need to be accessed via episodes
     // We'll create a placeholder URL that can be parsed later to load episodes
     val streamUrl = "${credentials.serverUrl}/series/${credentials.username}/${credentials.password}/$series_id.m3u8"
+    // Use category name from map if available, otherwise use category_id
+    val categoryName = category_id?.let { categoryMap[it] } ?: category_id
     return Channel(
         id = "series_$series_id",
         name = name,
         streamUrl = streamUrl,
         logoUrl = cover,
+        groupTitle = categoryName,
         category = ChannelCategory.SERIES,
         description = plot,
         rating = rating,
