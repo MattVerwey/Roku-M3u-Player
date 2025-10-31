@@ -18,6 +18,14 @@ Could not GET 'https://dl.google.com/dl/android/maven2/com/android/tools/build/g
 - Only `github.com` and `repo.maven.apache.org` (Maven Central) are accessible
 - Android Gradle Plugin is exclusively published to Google's Maven repository
 
+## 🔧 How to Unblock These Sites
+
+**See UNBLOCK_SITES_GUIDE.md for detailed instructions on:**
+- Configuring network/firewall settings
+- Using VPN or proxy
+- Pre-downloading dependencies for offline builds
+- Testing network access
+
 ## Accessible Repositories
 
 ✅ github.com  

@@ -23,6 +23,16 @@
 
 ---
 
+## 🔧 Want to Build Locally Instead?
+
+If you prefer to build the APK on your own machine instead of using GitHub Actions, see **UNBLOCK_SITES_GUIDE.md** for instructions on:
+- Unblocking `dl.google.com` and Maven repositories
+- Configuring proxy settings
+- Using VPN or mobile hotspot
+- Pre-downloading dependencies for offline builds
+
+---
+
 ## 🎯 What You Need to Do Now:
 
 ### STEP 1: Approve the Build (2 minutes)
