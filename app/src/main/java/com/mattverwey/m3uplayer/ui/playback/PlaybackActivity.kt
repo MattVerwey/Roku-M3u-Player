@@ -137,10 +137,19 @@ class PlaybackActivity : AppCompatActivity() {
             trackSelectionDialog = TrackSelectionDialog(this, exoPlayer)
             
             // Set up media item
-            val mediaItem = MediaItem.fromUri(channel!!.streamUrl)
-            exoPlayer.setMediaItem(mediaItem)
-            exoPlayer.prepare()
-            exoPlayer.playWhenReady = true
+            channel?.streamUrl?.let { url ->
+                val mediaItem = MediaItem.fromUri(url)
+                exoPlayer.setMediaItem(mediaItem)
+                exoPlayer.prepare()
+                exoPlayer.playWhenReady = true
+            } ?: run {
+                Toast.makeText(
+                    this@PlaybackActivity,
+                    "Error: Invalid stream URL",
+                    Toast.LENGTH_SHORT
+                ).show()
+                finish()
+            }
             
             // Add listener for playback events
             exoPlayer.addListener(object : Player.Listener {
@@ -182,16 +191,16 @@ class PlaybackActivity : AppCompatActivity() {
     }
     
     private fun setupControls() {
-        // Get control views
-        val playerControls = findViewById<LinearLayout>(R.id.player_controls)
-        val btnSubtitles = findViewById<Button>(R.id.btn_subtitles)
-        val btnAudioTrack = findViewById<Button>(R.id.btn_audio_track)
-        val btnVideoQuality = findViewById<Button>(R.id.btn_video_quality)
-        val btnRewind = findViewById<Button>(R.id.btn_rewind)
-        val btnPlayPause = findViewById<Button>(R.id.exo_play_pause)
-        val btnFastForward = findViewById<Button>(R.id.btn_fast_forward)
-        val btnTvGuide = findViewById<Button>(R.id.btn_tv_guide)
-        val btnPlayNext = findViewById<Button>(R.id.btn_play_next)
+        // Get control views with null safety
+        val playerControls = findViewById<LinearLayout>(R.id.player_controls) ?: return
+        val btnSubtitles = findViewById<Button>(R.id.btn_subtitles) ?: return
+        val btnAudioTrack = findViewById<Button>(R.id.btn_audio_track) ?: return
+        val btnVideoQuality = findViewById<Button>(R.id.btn_video_quality) ?: return
+        val btnRewind = findViewById<Button>(R.id.btn_rewind) ?: return
+        val btnPlayPause = findViewById<Button>(R.id.exo_play_pause) ?: return
+        val btnFastForward = findViewById<Button>(R.id.btn_fast_forward) ?: return
+        val btnTvGuide = findViewById<Button>(R.id.btn_tv_guide) ?: return
+        val btnPlayNext = findViewById<Button>(R.id.btn_play_next) ?: return
         
         // Setup subtitle button
         btnSubtitles.setOnClickListener {
@@ -281,17 +290,17 @@ class PlaybackActivity : AppCompatActivity() {
     }
     
     private fun showControls() {
-        val playerControls = findViewById<LinearLayout>(R.id.player_controls)
+        val playerControls = findViewById<LinearLayout>(R.id.player_controls) ?: return
         playerControls.visibility = View.VISIBLE
         controlsVisible = true
         resetHideControlsTimer()
     }
     
     private fun hideControls() {
-        val playerControls = findViewById<LinearLayout>(R.id.player_controls)
+        val playerControls = findViewById<LinearLayout>(R.id.player_controls) ?: return
         playerControls.visibility = View.GONE
         val tvGuideLayout = findViewById<LinearLayout>(R.id.tv_guide_layout)
-        tvGuideLayout.visibility = View.GONE
+        tvGuideLayout?.visibility = View.GONE
         controlsVisible = false
         hideControlsRunnable?.let { handler.removeCallbacks(it) }
     }
@@ -325,7 +334,7 @@ class PlaybackActivity : AppCompatActivity() {
     }
     
     private fun toggleTVGuide() {
-        val tvGuideLayout = findViewById<LinearLayout>(R.id.tv_guide_layout)
+        val tvGuideLayout = findViewById<LinearLayout>(R.id.tv_guide_layout) ?: return
         if (tvGuideLayout.visibility == View.VISIBLE) {
             tvGuideLayout.visibility = View.GONE
         } else {
@@ -335,10 +344,10 @@ class PlaybackActivity : AppCompatActivity() {
     }
     
     private fun updateTVGuide() {
-        val tvGuideLayout = findViewById<LinearLayout>(R.id.tv_guide_layout)
-        val currentProgramContainer = tvGuideLayout.findViewById<LinearLayout>(R.id.current_program_container)
-        val upcomingProgramContainer = tvGuideLayout.findViewById<LinearLayout>(R.id.upcoming_program_container)
-        val noEpgMessage = tvGuideLayout.findViewById<TextView>(R.id.no_epg_message)
+        val tvGuideLayout = findViewById<LinearLayout>(R.id.tv_guide_layout) ?: return
+        val currentProgramContainer = tvGuideLayout.findViewById<LinearLayout>(R.id.current_program_container) ?: return
+        val upcomingProgramContainer = tvGuideLayout.findViewById<LinearLayout>(R.id.upcoming_program_container) ?: return
+        val noEpgMessage = tvGuideLayout.findViewById<TextView>(R.id.no_epg_message) ?: return
         
         val (current, upcoming) = epgService.getCurrentAndUpcomingPrograms(
             channel?.epgChannelId,
@@ -401,22 +410,26 @@ class PlaybackActivity : AppCompatActivity() {
     }
     
     private fun playNextEpisode() {
-        if (seriesPlaybackHelper == null || channel?.seasonNumber == null || channel?.episodeNumber == null) {
+        val helper = seriesPlaybackHelper
+        val currentChannel = channel
+        
+        if (helper == null || currentChannel == null) {
+            finish()
+            return
+        }
+        
+        val seasonNumber = currentChannel.seasonNumber
+        val episodeNumber = currentChannel.episodeNumber
+        
+        if (seasonNumber == null || episodeNumber == null) {
             finish()
             return
         }
 
-        // Extract non-null values after null check
-        val seasonNumber = channel!!.seasonNumber!!
-        val episodeNumber = channel!!.episodeNumber!!
-
-        val nextEpisode = seriesPlaybackHelper?.getNextEpisode(
-            seasonNumber,
-            episodeNumber
-        )
+        val nextEpisode = helper.getNextEpisode(seasonNumber, episodeNumber)
         
         if (nextEpisode != null) {
-            val nextUrl = seriesPlaybackHelper?.getEpisodeStreamUrl(nextEpisode)
+            val nextUrl = helper.getEpisodeStreamUrl(nextEpisode)
             if (nextUrl != null) {
                 player?.let { p ->
                     val mediaItem = MediaItem.fromUri(nextUrl)
@@ -425,8 +438,8 @@ class PlaybackActivity : AppCompatActivity() {
                     p.playWhenReady = true
                     
                     // Update channel info
-                    channel = channel?.copy(
-                        name = seriesPlaybackHelper?.getEpisodeTitle(nextEpisode) ?: nextEpisode.title,
+                    channel = currentChannel.copy(
+                        name = helper.getEpisodeTitle(nextEpisode) ?: nextEpisode.title,
                         streamUrl = nextUrl,
                         seasonNumber = nextEpisode.season,
                         episodeNumber = nextEpisode.episode_num
@@ -439,6 +452,8 @@ class PlaybackActivity : AppCompatActivity() {
                         binding.channelName.visibility = View.GONE
                     }, 3000)
                 }
+            } else {
+                finish()
             }
         } else {
             finish()
