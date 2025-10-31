@@ -181,16 +181,10 @@ class DetailsFragment : DetailsSupportFragment() {
         else 
             getString(R.string.add_to_favorites)
         
-        // Update the action in the overview row
-        detailsOverview.actionsAdapter.apply {
-            for (i in 0 until size()) {
-                val item = get(i)
-                if (item is Action && item.id == ACTION_FAVORITE) {
-                    set(i, Action(ACTION_FAVORITE, newFavoriteText))
-                    break
-                }
-            }
-        }
+        // Rebuild actions with updated favorite text
+        detailsOverview.actionsAdapter.clear()
+        detailsOverview.addAction(Action(ACTION_WATCH, getString(R.string.watch_now)))
+        detailsOverview.addAction(Action(ACTION_FAVORITE, newFavoriteText))
     }
     
     private fun playChannel() {
