@@ -116,7 +116,7 @@ class BrowseFragment : BrowseSupportFragment() {
         // 1. Favorites - Show user's favorite content first
         val favorites = repository.getFavoriteChannels(channels)
         if (favorites.isNotEmpty()) {
-            addRow("⭐ Favorites", favorites)
+            addRow("⭐ Favorites", favorites.take(20))
         }
         
         // 2. Recently Watched - Show at the top for easy access
@@ -128,33 +128,46 @@ class BrowseFragment : BrowseSupportFragment() {
         // 3. Recommendations - Based on watch history
         val recommendations = repository.getRecommendations(channels, maxRecommendations = 20)
         if (recommendations.isNotEmpty()) {
-            addRow("💡 Recommended For You", recommendations)
+            addRow("💡 Recommended For You", recommendations.take(20))
         }
         
         // 4. Latest Added - Recently added content
         val latestAdded = repository.getLatestAddedContent(channels, limit = 20)
         if (latestAdded.isNotEmpty()) {
-            addRow("🆕 Latest Added", latestAdded)
+            addRow("🆕 Latest Added", latestAdded.take(20))
         }
         
-        // CATEGORY SECTIONS - Full browsable categories
-        
-        // 5. Live TV - All live channels
+        // LIVE TV CATEGORIES - Organize by groupTitle (category names like "UK Entertainment", "US Sports", etc.)
         if (liveChannels.isNotEmpty()) {
-            addRow("📺 Live TV", liveChannels.take(30))
+            val liveCategoriesMap = liveChannels.groupBy { it.groupTitle ?: "Uncategorized" }
+            liveCategoriesMap.entries
+                .sortedBy { it.key }
+                .forEach { (categoryName, categoryChannels) ->
+                    addRow("📺 $categoryName", categoryChannels.take(20))
+                }
         }
         
-        // 6. Movies - All movies
+        // MOVIE CATEGORIES - Organize by groupTitle (genre/category names)
         if (movies.isNotEmpty()) {
-            addRow("🎬 Movies", movies.take(30))
+            val movieCategoriesMap = movies.groupBy { it.groupTitle ?: "Uncategorized" }
+            movieCategoriesMap.entries
+                .sortedBy { it.key }
+                .forEach { (categoryName, categoryChannels) ->
+                    addRow("🎬 $categoryName", categoryChannels.take(20))
+                }
         }
         
-        // 7. Series - All series
+        // SERIES CATEGORIES - Organize by groupTitle (genre/category names)
         if (series.isNotEmpty()) {
-            addRow("📺 Series", series.take(30))
+            val seriesCategoriesMap = series.groupBy { it.groupTitle ?: "Uncategorized" }
+            seriesCategoriesMap.entries
+                .sortedBy { it.key }
+                .forEach { (categoryName, categoryChannels) ->
+                    addRow("📺 $categoryName", categoryChannels.take(20))
+                }
         }
         
-        // 8. Settings - Empty row for settings menu
+        // Settings - Empty row for settings menu
         val emptyRow = ArrayObjectAdapter(ChannelCardPresenter())
         val settingsHeader = HeaderItem(rowsAdapter.size().toLong(), "⚙️ Settings")
         rowsAdapter.add(ListRow(settingsHeader, emptyRow))
