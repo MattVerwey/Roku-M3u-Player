@@ -31,17 +31,19 @@ class M3UParser {
                     }
                     trimmedLine.isNotEmpty() && !trimmedLine.startsWith("#") && currentName != null -> {
                         // This is the stream URL
-                        channels.add(
-                            Channel(
-                                id = UUID.randomUUID().toString(),
-                                name = currentName!!,
-                                streamUrl = trimmedLine,
-                                logoUrl = currentLogoUrl,
-                                groupTitle = currentGroupTitle,
-                                epgChannelId = currentEpgChannelId,
-                                category = ChannelCategory.LIVE_TV
+                        currentName?.let { name ->
+                            channels.add(
+                                Channel(
+                                    id = UUID.randomUUID().toString(),
+                                    name = name,
+                                    streamUrl = trimmedLine,
+                                    logoUrl = currentLogoUrl,
+                                    groupTitle = currentGroupTitle,
+                                    epgChannelId = currentEpgChannelId,
+                                    category = ChannelCategory.LIVE_TV
+                                )
                             )
-                        )
+                        }
                         // Reset for next channel
                         currentName = null
                         currentLogoUrl = null
