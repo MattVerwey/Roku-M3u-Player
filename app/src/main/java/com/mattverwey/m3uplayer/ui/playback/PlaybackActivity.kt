@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.util.Rational
 import android.view.KeyEvent
 import android.view.View
@@ -49,6 +50,7 @@ class PlaybackActivity : AppCompatActivity() {
     private var seriesPlaybackHelper: SeriesPlaybackHelper? = null
     
     companion object {
+        private const val TAG = "PlaybackActivity"
         const val EXTRA_CHANNEL = "extra_channel"
         const val EXTRA_SERIES_INFO = "extra_series_info"
         const val EXTRA_CREDENTIALS = "extra_credentials"
@@ -192,15 +194,42 @@ class PlaybackActivity : AppCompatActivity() {
     
     private fun setupControls() {
         // Get control views with null safety
-        val playerControls = findViewById<LinearLayout>(R.id.player_controls) ?: return
-        val btnSubtitles = findViewById<Button>(R.id.btn_subtitles) ?: return
-        val btnAudioTrack = findViewById<Button>(R.id.btn_audio_track) ?: return
-        val btnVideoQuality = findViewById<Button>(R.id.btn_video_quality) ?: return
-        val btnRewind = findViewById<Button>(R.id.btn_rewind) ?: return
-        val btnPlayPause = findViewById<Button>(R.id.exo_play_pause) ?: return
-        val btnFastForward = findViewById<Button>(R.id.btn_fast_forward) ?: return
-        val btnTvGuide = findViewById<Button>(R.id.btn_tv_guide) ?: return
-        val btnPlayNext = findViewById<Button>(R.id.btn_play_next) ?: return
+        val playerControls = findViewById<LinearLayout>(R.id.player_controls) ?: run {
+            Log.e(TAG, "Failed to find player_controls view")
+            return
+        }
+        val btnSubtitles = findViewById<Button>(R.id.btn_subtitles) ?: run {
+            Log.e(TAG, "Failed to find btn_subtitles view")
+            return
+        }
+        val btnAudioTrack = findViewById<Button>(R.id.btn_audio_track) ?: run {
+            Log.e(TAG, "Failed to find btn_audio_track view")
+            return
+        }
+        val btnVideoQuality = findViewById<Button>(R.id.btn_video_quality) ?: run {
+            Log.e(TAG, "Failed to find btn_video_quality view")
+            return
+        }
+        val btnRewind = findViewById<Button>(R.id.btn_rewind) ?: run {
+            Log.e(TAG, "Failed to find btn_rewind view")
+            return
+        }
+        val btnPlayPause = findViewById<Button>(R.id.exo_play_pause) ?: run {
+            Log.e(TAG, "Failed to find exo_play_pause view")
+            return
+        }
+        val btnFastForward = findViewById<Button>(R.id.btn_fast_forward) ?: run {
+            Log.e(TAG, "Failed to find btn_fast_forward view")
+            return
+        }
+        val btnTvGuide = findViewById<Button>(R.id.btn_tv_guide) ?: run {
+            Log.e(TAG, "Failed to find btn_tv_guide view")
+            return
+        }
+        val btnPlayNext = findViewById<Button>(R.id.btn_play_next) ?: run {
+            Log.e(TAG, "Failed to find btn_play_next view")
+            return
+        }
         
         // Setup subtitle button
         btnSubtitles.setOnClickListener {
@@ -290,16 +319,25 @@ class PlaybackActivity : AppCompatActivity() {
     }
     
     private fun showControls() {
-        val playerControls = findViewById<LinearLayout>(R.id.player_controls) ?: return
+        val playerControls = findViewById<LinearLayout>(R.id.player_controls) ?: run {
+            Log.w(TAG, "Player controls not found, cannot show controls")
+            return
+        }
         playerControls.visibility = View.VISIBLE
         controlsVisible = true
         resetHideControlsTimer()
     }
     
     private fun hideControls() {
-        val playerControls = findViewById<LinearLayout>(R.id.player_controls) ?: return
+        val playerControls = findViewById<LinearLayout>(R.id.player_controls) ?: run {
+            Log.w(TAG, "Player controls not found, cannot hide controls")
+            return
+        }
         playerControls.visibility = View.GONE
-        val tvGuideLayout = findViewById<LinearLayout>(R.id.tv_guide_layout) ?: return
+        val tvGuideLayout = findViewById<LinearLayout>(R.id.tv_guide_layout) ?: run {
+            Log.w(TAG, "TV guide layout not found")
+            return
+        }
         tvGuideLayout.visibility = View.GONE
         controlsVisible = false
         hideControlsRunnable?.let { handler.removeCallbacks(it) }
@@ -334,7 +372,10 @@ class PlaybackActivity : AppCompatActivity() {
     }
     
     private fun toggleTVGuide() {
-        val tvGuideLayout = findViewById<LinearLayout>(R.id.tv_guide_layout) ?: return
+        val tvGuideLayout = findViewById<LinearLayout>(R.id.tv_guide_layout) ?: run {
+            Log.w(TAG, "TV guide layout not found, cannot toggle")
+            return
+        }
         if (tvGuideLayout.visibility == View.VISIBLE) {
             tvGuideLayout.visibility = View.GONE
         } else {
@@ -344,10 +385,22 @@ class PlaybackActivity : AppCompatActivity() {
     }
     
     private fun updateTVGuide() {
-        val tvGuideLayout = findViewById<LinearLayout>(R.id.tv_guide_layout) ?: return
-        val currentProgramContainer = tvGuideLayout.findViewById<LinearLayout>(R.id.current_program_container) ?: return
-        val upcomingProgramContainer = tvGuideLayout.findViewById<LinearLayout>(R.id.upcoming_program_container) ?: return
-        val noEpgMessage = tvGuideLayout.findViewById<TextView>(R.id.no_epg_message) ?: return
+        val tvGuideLayout = findViewById<LinearLayout>(R.id.tv_guide_layout) ?: run {
+            Log.w(TAG, "TV guide layout not found, cannot update")
+            return
+        }
+        val currentProgramContainer = tvGuideLayout.findViewById<LinearLayout>(R.id.current_program_container) ?: run {
+            Log.w(TAG, "Current program container not found in TV guide")
+            return
+        }
+        val upcomingProgramContainer = tvGuideLayout.findViewById<LinearLayout>(R.id.upcoming_program_container) ?: run {
+            Log.w(TAG, "Upcoming program container not found in TV guide")
+            return
+        }
+        val noEpgMessage = tvGuideLayout.findViewById<TextView>(R.id.no_epg_message) ?: run {
+            Log.w(TAG, "No EPG message not found in TV guide")
+            return
+        }
         
         val (current, upcoming) = epgService.getCurrentAndUpcomingPrograms(
             channel?.epgChannelId,
