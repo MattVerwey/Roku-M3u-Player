@@ -186,7 +186,7 @@ class DetailsFragment : DetailsSupportFragment() {
             for (i in 0 until size()) {
                 val item = get(i)
                 if (item is Action && item.id == ACTION_FAVORITE) {
-                    remove(item)
+                    removeItems(i, 1)
                     add(i, Action(ACTION_FAVORITE, newFavoriteText))
                     break
                 }
