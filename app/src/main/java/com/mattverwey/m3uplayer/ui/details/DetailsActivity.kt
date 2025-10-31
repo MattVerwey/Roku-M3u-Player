@@ -182,7 +182,15 @@ class DetailsFragment : DetailsSupportFragment() {
             getString(R.string.add_to_favorites)
         
         // Rebuild actions with updated favorite text
-        detailsOverview.actionsAdapter.clear()
+        // Remove all existing actions
+        val adapter = detailsOverview.actionsAdapter
+        for (i in adapter.size() - 1 downTo 0) {
+            val action = adapter.get(i) as? Action
+            if (action != null) {
+                detailsOverview.removeAction(action)
+            }
+        }
+        // Re-add actions with updated text
         detailsOverview.addAction(Action(ACTION_WATCH, getString(R.string.watch_now)))
         detailsOverview.addAction(Action(ACTION_FAVORITE, newFavoriteText))
     }
