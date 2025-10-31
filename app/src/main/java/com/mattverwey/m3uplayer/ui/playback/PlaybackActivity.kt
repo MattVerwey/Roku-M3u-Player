@@ -299,8 +299,8 @@ class PlaybackActivity : AppCompatActivity() {
     private fun hideControls() {
         val playerControls = findViewById<LinearLayout>(R.id.player_controls) ?: return
         playerControls.visibility = View.GONE
-        val tvGuideLayout = findViewById<LinearLayout>(R.id.tv_guide_layout)
-        tvGuideLayout?.visibility = View.GONE
+        val tvGuideLayout = findViewById<LinearLayout>(R.id.tv_guide_layout) ?: return
+        tvGuideLayout.visibility = View.GONE
         controlsVisible = false
         hideControlsRunnable?.let { handler.removeCallbacks(it) }
     }
@@ -453,9 +453,19 @@ class PlaybackActivity : AppCompatActivity() {
                     }, 3000)
                 }
             } else {
+                Toast.makeText(
+                    this,
+                    "Error: Unable to load next episode",
+                    Toast.LENGTH_SHORT
+                ).show()
                 finish()
             }
         } else {
+            Toast.makeText(
+                this,
+                "No more episodes available",
+                Toast.LENGTH_SHORT
+            ).show()
             finish()
         }
     }
