@@ -56,6 +56,7 @@ class CacheManager(context: Context) {
         private const val KEY_XTREAM_CREDS = "xtream_credentials"
         private const val KEY_M3U_URL = "m3u_url"
         private const val KEY_RECENTLY_WATCHED = "recently_watched"
+        private const val KEY_FAVORITES = "favorites"
         private const val KEY_TRACKING_ENABLED = "tracking_enabled"
         
         private const val CACHE_EXPIRY_MS = 24 * 60 * 60 * 1000L // 24 hours
@@ -195,6 +196,39 @@ class CacheManager(context: Context) {
     
     fun clearRecentlyWatched() {
         securePrefs.edit().remove(KEY_RECENTLY_WATCHED).apply()
+    }
+    
+    // Favorites (stored securely)
+    fun getFavorites(): Set<String> {
+        val json = securePrefs.getString(KEY_FAVORITES, null) ?: return emptySet()
+        return try {
+            val type = object : TypeToken<Set<String>>() {}.type
+            gson.fromJson(json, type)
+        } catch (e: Exception) {
+            emptySet()
+        }
+    }
+    
+    fun addToFavorites(channelId: String) {
+        val current = getFavorites().toMutableSet()
+        current.add(channelId)
+        val json = gson.toJson(current)
+        securePrefs.edit().putString(KEY_FAVORITES, json).apply()
+    }
+    
+    fun removeFromFavorites(channelId: String) {
+        val current = getFavorites().toMutableSet()
+        current.remove(channelId)
+        val json = gson.toJson(current)
+        securePrefs.edit().putString(KEY_FAVORITES, json).apply()
+    }
+    
+    fun isFavorite(channelId: String): Boolean {
+        return getFavorites().contains(channelId)
+    }
+    
+    fun clearFavorites() {
+        securePrefs.edit().remove(KEY_FAVORITES).apply()
     }
     
     // Cache validation

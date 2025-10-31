@@ -200,6 +200,26 @@ class ChannelRepository(private val cacheManager: CacheManager) {
         )
     }
     
+    // Favorites management
+    fun getFavoriteChannels(allChannels: List<Channel>): List<Channel> {
+        val favoriteIds = cacheManager.getFavorites()
+        return favoriteIds.mapNotNull { id ->
+            allChannels.find { it.id == id }
+        }
+    }
+    
+    fun addToFavorites(channelId: String) {
+        cacheManager.addToFavorites(channelId)
+    }
+    
+    fun removeFromFavorites(channelId: String) {
+        cacheManager.removeFromFavorites(channelId)
+    }
+    
+    fun isFavorite(channelId: String): Boolean {
+        return cacheManager.isFavorite(channelId)
+    }
+    
     // Clear cache
     fun clearCache() {
         cacheManager.clearCache()
