@@ -181,17 +181,18 @@ class DetailsFragment : DetailsSupportFragment() {
         else 
             getString(R.string.add_to_favorites)
         
-        // Update the action in the overview row
-        detailsOverview.actionsAdapter.apply {
-            for (i in 0 until size()) {
-                val item = get(i)
-                if (item is Action && item.id == ACTION_FAVORITE) {
-                    remove(item)
-                    add(i, Action(ACTION_FAVORITE, newFavoriteText))
-                    break
-                }
+        // Rebuild actions with updated favorite text
+        // Remove all existing actions
+        val adapter = detailsOverview.actionsAdapter
+        for (i in adapter.size() - 1 downTo 0) {
+            val action = adapter.get(i) as? Action
+            if (action != null) {
+                detailsOverview.removeAction(action)
             }
         }
+        // Re-add actions with updated text
+        detailsOverview.addAction(Action(ACTION_WATCH, getString(R.string.watch_now)))
+        detailsOverview.addAction(Action(ACTION_FAVORITE, newFavoriteText))
     }
     
     private fun playChannel() {
