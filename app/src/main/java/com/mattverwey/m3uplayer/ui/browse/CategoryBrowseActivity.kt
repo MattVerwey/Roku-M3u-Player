@@ -35,7 +35,7 @@ class CategoryBrowseActivity : FragmentActivity() {
         
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.main_browse_fragment, CategoryBrowseFragment.newInstance(categoryType))
+                .replace(R.id.main_container, CategoryBrowseFragment.newInstance(categoryType))
                 .commit()
         }
     }
