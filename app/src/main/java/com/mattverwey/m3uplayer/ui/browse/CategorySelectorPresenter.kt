@@ -18,7 +18,7 @@ class CategorySelectorPresenter : Presenter() {
         private const val CARD_HEIGHT = 176
     }
     
-    override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup): Presenter.ViewHolder {
         val cardView = TextView(parent.context).apply {
             layoutParams = ViewGroup.LayoutParams(CARD_WIDTH, CARD_HEIGHT)
             isFocusable = true
@@ -30,17 +30,17 @@ class CategorySelectorPresenter : Presenter() {
             setPadding(16, 16, 16, 16)
         }
         
-        return ViewHolder(cardView)
+        return Presenter.ViewHolder(cardView)
     }
     
-    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any) {
+    override fun onBindViewHolder(viewHolder: Presenter.ViewHolder, item: Any?) {
         val selector = item as CategorySelector
         val cardView = viewHolder.view as TextView
         
         cardView.text = "${selector.icon}\n${selector.title}"
     }
     
-    override fun onUnbindViewHolder(viewHolder: ViewHolder) {
+    override fun onUnbindViewHolder(viewHolder: Presenter.ViewHolder) {
         // Nothing to unbind
     }
 }
