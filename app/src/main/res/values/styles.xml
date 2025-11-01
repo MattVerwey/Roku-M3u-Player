@@ -45,12 +45,12 @@
         <item name="android:textAllCaps">false</item>
     </style>
     
-    <style name="Theme.Leanback.Details" parent="Theme.Leanback.Details">
+    <style name="Theme.Leanback.Details" parent="Theme.Leanback">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
     </style>
     
-    <style name="Theme.Leanback.VerticalGrid" parent="Theme.Leanback.VerticalGrid">
+    <style name="Theme.Leanback.VerticalGrid" parent="Theme.Leanback">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
     </style>
