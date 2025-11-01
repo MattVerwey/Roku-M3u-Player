@@ -2,7 +2,6 @@ package com.mattverwey.m3uplayer.ui.browse
 
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import com.mattverwey.m3uplayer.R
