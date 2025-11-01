@@ -13,6 +13,7 @@ import com.mattverwey.m3uplayer.R
 import com.mattverwey.m3uplayer.data.cache.CacheManager
 import com.mattverwey.m3uplayer.data.model.Channel
 import com.mattverwey.m3uplayer.data.model.ChannelCategory
+import com.mattverwey.m3uplayer.data.model.CategorySelector
 import com.mattverwey.m3uplayer.repository.ChannelRepository
 import com.mattverwey.m3uplayer.ui.details.DetailsActivity
 import com.mattverwey.m3uplayer.ui.playback.PlaybackActivity
@@ -62,6 +63,9 @@ class BrowseFragment : BrowseSupportFragment() {
                 } else {
                     showDetails(item)
                 }
+            } else if (item is CategorySelector) {
+                // Navigate to category browse page
+                CategoryBrowseActivity.start(requireContext(), item.categoryType)
             }
         }
         
@@ -111,60 +115,55 @@ class BrowseFragment : BrowseSupportFragment() {
         val movies = channels.filter { it.category == ChannelCategory.MOVIE }
         val series = channels.filter { it.category == ChannelCategory.SERIES }
         
-        // HOME PAGE SECTIONS - Create a proper landing page
+        // HOME PAGE SECTIONS - Personalized content only
         
-        // 1. Favorites - Show user's favorite content first
-        val favorites = repository.getFavoriteChannels(channels)
-        if (favorites.isNotEmpty()) {
-            addRow("⭐ Favorites", favorites.take(20))
-        }
-        
-        // 2. Recently Watched - Show at the top for easy access
+        // 1. Recently Watched - Show at the top for easy access
         val recentlyWatched = repository.getRecentlyWatchedChannels(channels)
         if (recentlyWatched.isNotEmpty()) {
-            addRow("⏱️ Recently Watched", recentlyWatched.take(20))
+            addChannelRow("⏱️ Recently Watched", recentlyWatched.take(20))
         }
         
-        // 3. Recommendations - Based on watch history
+        // 2. Recommendations - Based on watch history
         val recommendations = repository.getRecommendations(channels, maxRecommendations = 20)
         if (recommendations.isNotEmpty()) {
-            addRow("💡 Recommended For You", recommendations.take(20))
+            addChannelRow("💡 Recommended For You", recommendations.take(20))
         }
         
-        // 4. Latest Added - Recently added content
+        // 3. Latest Added - Recently added content
         val latestAdded = repository.getLatestAddedContent(channels, limit = 20)
         if (latestAdded.isNotEmpty()) {
-            addRow("🆕 Latest Added", latestAdded.take(20))
+            addChannelRow("🆕 Latest Added", latestAdded.take(20))
         }
         
-        // LIVE TV CATEGORIES - Organize by groupTitle (category names like "UK Entertainment", "US Sports", etc.)
+        // CATEGORY SELECTORS - Navigate to dedicated category pages
+        val categorySelectors = mutableListOf<CategorySelector>()
+        
         if (liveChannels.isNotEmpty()) {
-            val liveCategoriesMap = liveChannels.groupBy { it.groupTitle ?: "Uncategorized" }
-            liveCategoriesMap.entries
-                .sortedBy { it.key }
-                .forEach { (categoryName, categoryChannels) ->
-                    addRow("📺 $categoryName", categoryChannels.take(20))
-                }
+            categorySelectors.add(CategorySelector(
+                ChannelCategory.LIVE_TV,
+                "Live TV",
+                "📺"
+            ))
         }
         
-        // MOVIE CATEGORIES - Organize by groupTitle (genre/category names)
         if (movies.isNotEmpty()) {
-            val movieCategoriesMap = movies.groupBy { it.groupTitle ?: "Uncategorized" }
-            movieCategoriesMap.entries
-                .sortedBy { it.key }
-                .forEach { (categoryName, categoryChannels) ->
-                    addRow("🎬 $categoryName", categoryChannels.take(20))
-                }
+            categorySelectors.add(CategorySelector(
+                ChannelCategory.MOVIE,
+                "Movies",
+                "🎬"
+            ))
         }
         
-        // SERIES CATEGORIES - Organize by groupTitle (genre/category names)
         if (series.isNotEmpty()) {
-            val seriesCategoriesMap = series.groupBy { it.groupTitle ?: "Uncategorized" }
-            seriesCategoriesMap.entries
-                .sortedBy { it.key }
-                .forEach { (categoryName, categoryChannels) ->
-                    addRow("📺 $categoryName", categoryChannels.take(20))
-                }
+            categorySelectors.add(CategorySelector(
+                ChannelCategory.SERIES,
+                "Series",
+                "📺"
+            ))
+        }
+        
+        if (categorySelectors.isNotEmpty()) {
+            addCategorySelectorRow("Browse by Category", categorySelectors)
         }
         
         // Settings - Empty row for settings menu
@@ -178,12 +177,24 @@ class BrowseFragment : BrowseSupportFragment() {
         selectedPosition = 0
     }
     
-    private fun addRow(title: String, channels: List<Channel>) {
+    private fun addChannelRow(title: String, channels: List<Channel>) {
         val cardPresenter = ChannelCardPresenter()
         val listRowAdapter = ArrayObjectAdapter(cardPresenter)
         
         channels.forEach { channel ->
             listRowAdapter.add(channel)
+        }
+        
+        val header = HeaderItem(rowsAdapter.size().toLong(), title)
+        rowsAdapter.add(ListRow(header, listRowAdapter))
+    }
+    
+    private fun addCategorySelectorRow(title: String, selectors: List<CategorySelector>) {
+        val selectorPresenter = CategorySelectorPresenter()
+        val listRowAdapter = ArrayObjectAdapter(selectorPresenter)
+        
+        selectors.forEach { selector ->
+            listRowAdapter.add(selector)
         }
         
         val header = HeaderItem(rowsAdapter.size().toLong(), title)
