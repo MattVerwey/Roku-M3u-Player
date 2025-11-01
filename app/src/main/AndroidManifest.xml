@@ -66,6 +66,12 @@
             android:configChanges="keyboard|keyboardHidden|navigation"
             android:screenOrientation="landscape"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
+
+        <!-- Category Browse Activity -->
+        <activity
+            android:name=".ui.browse.CategoryBrowseActivity"
+            android:configChanges="keyboard|keyboardHidden|navigation"
+            android:screenOrientation="landscape" />
     </application>
 
 </manifest>
