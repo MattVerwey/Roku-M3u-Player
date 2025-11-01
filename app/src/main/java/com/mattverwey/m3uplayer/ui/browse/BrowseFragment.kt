@@ -228,11 +228,6 @@ class BrowseFragment : BrowseSupportFragment() {
     override fun onResume() {
         super.onResume()
         
-        // Always start with sidebar visible
-        if (!isShowingHeaders) {
-            startHeadersTransition(true)
-        }
-        
         // Refresh rows to update Recently Watched when returning from playback
         if (allChannels.isNotEmpty()) {
             setupRows(allChannels)
