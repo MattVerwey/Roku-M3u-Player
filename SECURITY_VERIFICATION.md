@@ -181,8 +181,8 @@ adb logcat | grep "CLEARTEXT communication"
 **Verification**:
 ```bash
 # Decompile release APK and verify
-apktool d app-release.apk
-grep -r "Log\." app-release/smali/
+apktool d app-release-unsigned.apk
+grep -r "Log\." app-release-unsigned/smali/
 # Expected: No Log statements found ✅
 ```
 

@@ -45,7 +45,7 @@ adb shell cat /data/data/com.mattverwey.m3uplayer/shared_prefs/m3u_player_secure
 ./gradlew assembleRelease
 
 # Install and test HTTP connection
-adb install app/build/outputs/apk/release/app-release.apk
+adb install app/build/outputs/apk/release/app-release-unsigned.apk
 # Attempt HTTP connection - should be blocked
 ```
 
@@ -72,10 +72,10 @@ adb install app/build/outputs/apk/release/app-release.apk
 ./gradlew assembleRelease
 
 # Decompile with apktool
-apktool d app/build/outputs/apk/release/app-release.apk
+apktool d app/build/outputs/apk/release/app-release-unsigned.apk
 
 # Check for Log statements (should find none)
-grep -r "Log\." app-release/smali/
+grep -r "Log\." app-release-unsigned/smali/
 ```
 
 ### 3.2 Code Quality
@@ -253,7 +253,7 @@ buildTypes {
 **Verification Method**: Check logcat in release build
 ```bash
 # Install release APK
-adb install app/build/outputs/apk/release/app-release.apk
+adb install app/build/outputs/apk/release/app-release-unsigned.apk
 
 # Monitor logcat (should have no sensitive data)
 adb logcat | grep "M3U\|mattverwey"
