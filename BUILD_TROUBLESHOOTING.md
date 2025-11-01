@@ -79,7 +79,7 @@ If you have a local development environment with internet access:
 
 # APK location
 # Debug: app/build/outputs/apk/debug/app-debug.apk
-# Release: app/build/outputs/apk/release/app-release.apk
+# Release: app/build/outputs/apk/release/app-release-unsigned.apk
 ```
 
 ### Code-Only Verification
