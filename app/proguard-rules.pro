@@ -40,6 +40,11 @@
 -keep class androidx.security.crypto.** { *; }
 -keep class com.google.crypto.tink.** { *; }
 
+# Tink has optional dependencies on Google API client and Joda Time
+# These are only used for the KeysDownloader feature which we don't use
+-dontwarn com.google.api.client.http.**
+-dontwarn org.joda.time.**
+
 # Prevent stack trace information leakage
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
